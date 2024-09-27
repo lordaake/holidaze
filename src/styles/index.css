@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* CSS styles for booked dates */
+
+.booked-date {
+  background-color: #fbb6ce !important;
+  color: #c53030 !important;
+}
+
+.booked-date:hover {
+  background-color: #fc8181 !important;
+  cursor: not-allowed;
+}
