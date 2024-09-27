@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { getVenues } from '../services/apiService';
+import { getAllVenues } from '../services/apiService';
 
 
 function HomePage() {
@@ -9,18 +9,8 @@ function HomePage() {
     useEffect(() => {
         async function fetchData() {
             try {
-                // Fetch venues with bookings
-                const response = await getVenues({ _bookings: true });
-
-                // Access the `data` property of the response to get the venues array
-                const venues = response.data;
-
-                // console.log('Fetched venues:', venues); // Debug log to check fetched venues
-
-                if (!Array.isArray(venues)) {
-                    console.error('Unexpected data structure:', venues);
-                    return;
-                }
+                // Fetch venues without any parameters
+                const venues = await getAllVenues();
 
                 // Filter venues that have at least one image in the media array
                 const venuesWithImages = venues.filter(venue => venue.media && venue.media.length > 0);
@@ -40,6 +30,7 @@ function HomePage() {
 
         fetchData();
     }, []);
+
 
     return (
         <div className="homepage bg-gray-100">

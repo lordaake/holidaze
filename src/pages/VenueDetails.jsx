@@ -29,7 +29,7 @@ function VenueDetails() {
     const [venue, setVenue] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
-    const placeholderImage = '/src/assets/images/placeholder-hotel.png';
+    const placeholderImage = 'https://via.placeholder.com/400x300?text=No+Image+Available';
 
     // Booking-related states
     const [bookedDates, setBookedDates] = useState([]);
@@ -74,6 +74,10 @@ function VenueDetails() {
             setLoading(false);
         }
     };
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
 
     useEffect(() => {
         fetchVenueData();

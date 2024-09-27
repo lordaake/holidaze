@@ -22,7 +22,7 @@ function Navbar() {
             <div className="container mx-auto flex items-center justify-between p-4">
                 {/* Logo and Title */}
                 <div className="flex items-center space-x-4">
-                    <img src="./holidaze-logo.png" alt="Holidaze Logo" className="h-10 w-auto" />
+                    <img src="holidaze-logo.png" alt="Holidaze Logo" className="h-10 w-auto" />
                     <h1 className="text-3xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">
                         <Link to="/">Holidaze</Link>
                     </h1>

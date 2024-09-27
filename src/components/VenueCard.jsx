@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { FaWifi, FaSwimmingPool, FaParking, FaUtensils, FaStar } from 'react-icons/fa';
 
 function VenueCard({ venue, topRated = false }) {
-    const placeholderImage = '/src/assets/images/placeholder-hotel.png';
+    const placeholderImage = 'https://via.placeholder.com/400x300?text=No+Image+Available';
     const venueImage = venue.media && venue.media.length > 0 ? venue.media[0].url : placeholderImage;
 
     return (

@@ -184,18 +184,6 @@ export const getUserProfile = async () => {
     }
 };
 
-// Function to get all venues
-export const getAllVenues = async () => {
-    try {
-        const response = await axios.get(`${API_URL}/holidaze/venues`);
-        // Extract the venues array from response.data.data
-        return response.data.data; // This should be the array of venues
-    } catch (error) {
-        console.error('Error fetching venues:', error.response?.data || error.message);
-        throw error;
-    }
-};
-
 // Function to search venues by name and description (server-side)
 export const searchVenues = async (query) => {
     try {
@@ -252,21 +240,18 @@ export const getVenueById = async (id, includeBookings = false, includeReviews =
     }
 };
 
-
-
-export const getVenues = async (params) => {
+// Function to get all venues
+export const getAllVenues = async () => {
     try {
-        const headers = getHeaders();
-        const response = await axios.get(`${API_URL}/holidaze/venues`, {
-            params,
-            headers
-        });
-        return response.data;
+        const response = await axios.get(`${API_URL}/holidaze/venues`);
+        // Extract the venues array from response.data.data
+        return response.data.data; // This should be the array of venues
     } catch (error) {
-        console.error('Error fetching venues with parameters:', error.response?.data || error.message);
+        console.error('Error fetching venues:', error.response?.data || error.message);
         throw error;
     }
 };
+
 
 
 // Function to get bookings for a specific venue by venueId
