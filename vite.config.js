@@ -8,7 +8,7 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === 'production' &&
     favicon({
-      logo: './public/holidaze-logo.png',
+      logo: './public/images/holidaze-logo.png',
       outputPath: 'assets/favicons',
       inject: true,
       favicons: {
