@@ -86,16 +86,16 @@ function Navbar() {
                 </ul>
 
                 {/* Mobile Menu */}
-                <div className={`fixed inset-0 bg-blue-900 bg-opacity-90 z-20 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+                <div className={`fixed inset-0 bg-blue-900 bg-opacity-5 z-20 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
                     <div className="flex justify-end p-4">
                         <button
                             className="p-2 rounded-md hover:bg-blue-700 transition duration-300"
                             onClick={handleMobileMenuToggle}
                         >
-                            <span className="text-2xl text-white">&#10005;</span> {/* Cross symbol */}
+                            <span className="text-2xl text-blue">&#10005;</span> {/* Cross symbol */}
                         </button>
                     </div>
-                    <div className="flex justify-center bg-blue-900 z-50 relative">
+                    <div className="flex justify-center bg-blue-900 z-50 relative bg-opacity-95">
                         <ul className="flex flex-col space-y-4 p-6 rounded-lg mt-16 text-lg font-semibold text-white">
                             {[
                                 { to: "/", text: "Home" },
