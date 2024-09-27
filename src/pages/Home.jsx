@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getVenues } from '../services/apiService';
 
+
 function HomePage() {
     const [featured, setFeatured] = useState([]);
 
@@ -45,7 +46,7 @@ function HomePage() {
             {/* Hero Section */}
             <section
                 className="hero bg-cover bg-center h-screen flex items-center justify-center text-center relative"
-                style={{ backgroundImage: "url('./src/assets/images/peackcock_hotel.webp')" }}
+                style={{ backgroundImage: "url('/images/peackcock_hotel.webp')" }}
             >
                 <div className="absolute inset-0 bg-black opacity-50"></div>
                 <div className="relative z-10 container mx-auto px-6 py-12">
