@@ -4,6 +4,11 @@
 
 /* CSS styles for booked dates */
 
+body {
+  background-color: white !important;
+}
+
+
 .booked-date {
   background-color: #fbb6ce !important;
   color: #c53030 !important;

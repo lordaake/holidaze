@@ -18,7 +18,7 @@ function Navbar() {
     };
 
     return (
-        <nav className="bg-white shadow-lg fixed w-full z-10 top-0 transition duration-300 ease-in-out transform">
+        <nav className="bg-white shadow-lg fixed w-full z-50 top-0 transition duration-300 ease-in-out transform">
             <div className="container mx-auto flex items-center justify-between p-4">
                 {/* Logo and Title */}
                 <div className="flex items-center space-x-4">
@@ -95,7 +95,7 @@ function Navbar() {
                             <span className="text-2xl text-white">&#10005;</span> {/* Cross symbol */}
                         </button>
                     </div>
-                    <div className="flex justify-center bg-blue-900 bg-opacity-90">
+                    <div className="flex justify-center bg-blue-900 z-50 relative">
                         <ul className="flex flex-col space-y-4 p-6 rounded-lg mt-16 text-lg font-semibold text-white">
                             {[
                                 { to: "/", text: "Home" },
