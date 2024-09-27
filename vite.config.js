@@ -6,9 +6,8 @@ import favicon from 'vite-plugin-favicon';
 export default defineConfig(({ mode }) => ({
   plugins: [
     react(),
-    mode === 'production' &&
     favicon({
-      logo: './public/images/holidaze-logo.png',
+      logo: './public/holidaze-logo.png',
       outputPath: 'assets/favicons',
       inject: true,
       favicons: {
