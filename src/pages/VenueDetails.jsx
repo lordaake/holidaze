@@ -359,7 +359,7 @@ function VenueDetails() {
                 pauseOnHover
             />
             <div className="relative bg-gray-100 py-12">
-                <div className="container mx-auto sm:px-4 px-2 lg:px-8">
+                <div className="container mx-auto sm:px-4 px-0 lg:px-8">
 
                     {/* Close Button (X Icon) */}
                     <button
@@ -382,7 +382,7 @@ function VenueDetails() {
                                 venue.media.map((image, index) => (
                                     <div
                                         key={index}
-                                        className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 snap-center"
+                                        className="flex-shrink-0 w-full sm:w-1/2 md:w-1/3 lg:w-1/4 snap-center p-2 sm:p-0"
                                     >
                                         <img
                                             src={image.url || placeholderImage}
@@ -404,7 +404,7 @@ function VenueDetails() {
                         </div>
                     </div>
 
-                    <div className="bg-white sm:p-6 p-4 rounded-lg shadow-lg">
+                    <div className="bg-white sm:p-6 p-2 pt-4 rounded-lg shadow-lg">
                         {/* Venue Pricing and Capacity */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                             <div className="flex items-center text-gray-800 text-lg md:text-xl">
