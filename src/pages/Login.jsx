@@ -66,22 +66,22 @@ function Login() {
             />
 
             {/* Login heading */}
-            <h2 className="text-4xl font-bold mb-6 text-center">Login</h2>
+            <h2 className="text-4xl font-bold mb-6 text-center text-black">Login</h2>
 
             {/* Login form */}
             <form
                 onSubmit={handleLogin} // Call the handleLogin function when the form is submitted
-                className="max-w-lg mx-auto bg-white p-8 shadow-lg rounded-lg" // Styling for the form container
+                className="max-w-lg mx-auto bg-white p-8 shadow-lg rounded-lg"
             >
                 {/* Email input field */}
                 <div className="mb-4">
                     <label className="block text-gray-700 mb-2">Email</label>
                     <input
                         type="email"
-                        value={email} // Bind the email state to the input field
+                        value={email}
                         onChange={(e) => setEmail(e.target.value)} // Update state when the user types
-                        className="form-input w-full" // Basic styling for the input
-                        required // Make this field required
+                        className="form-input w-full text-black"
+                        required
                     />
                 </div>
 
