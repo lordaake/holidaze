@@ -10,6 +10,13 @@ body {
   background-color: white !important;
 }
 
+body,
+html {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
 .booked-date {
   background-color: #fbb6ce !important;
   color: #c53030 !important;

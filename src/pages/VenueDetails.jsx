@@ -370,7 +370,6 @@ function VenueDetails() {
                         <FaTimes className="text-2xl" />
                     </button>
 
-
                     {/* Venue Name */}
                     <h2 className="text-4xl font-bold mb-6 text-blue-900 text-center">
                         {venue.name}

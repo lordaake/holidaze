@@ -446,7 +446,7 @@ function CreateVenuePage() {
                         {/* Cancel button navigates back to user dashboard */}
                         <button
                             type="button"
-                            onClick={() => navigate('/manage-venues')}
+                            onClick={() => navigate('/user-dashboard')}
                             className="bg-gray-500 text-white p-3 rounded-lg hover:bg-gray-600 transition duration-300"
                         >
                             Cancel

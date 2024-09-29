@@ -400,19 +400,27 @@ function Accommodations() {
 
             {/* **Filter Component** */}
             {!isSearching && (
-                <div className="mb-12 flex justify-center relative">
-                    <FilterVenues onFilterChange={handleFilterChange} />
+                <div className="mb-12 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 relative sm:space-x-4 sm:items-start">
+                    {/* Filter Input Section */}
+                    <div className="w-full sm:w-auto">
+                        <FilterVenues onFilterChange={handleFilterChange} />
+                    </div>
+
+                    {/* Reset Filter Button */}
                     {isFiltering && (
-                        <button
-                            onClick={resetFilter}
-                            className="absolute right-0 top-0 bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 font-semibold flex items-center px-3 py-1 rounded-full"
-                            aria-label="Reset Filter"
-                        >
-                            <FaArrowLeft className="mr-1" /> Back
-                        </button>
+                        <div className="w-full sm:w-auto">
+                            <button
+                                onClick={resetFilter}
+                                className="w-full sm:w-auto bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 font-semibold flex items-center justify-center px-4 py-2 rounded-lg"
+                                aria-label="Reset Filter"
+                            >
+                                <FaArrowLeft className="mr-1" /> Back
+                            </button>
+                        </div>
                     )}
                 </div>
             )}
+
 
             {/* **Error Message** */}
             {error && <div className="mb-8 text-center text-red-500">{error}</div>}

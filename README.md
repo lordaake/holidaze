@@ -91,61 +91,6 @@ You can view my GitHub profile [here](https://github.com/lordaake).
 1. This project uses the **Holidaze API** provided by Noroff.
 2. You will need an API key, which is generated upon user login. The API key and authentication token should be stored in `localStorage` for future API requests.
 
-## File Structure
-
-Here is the file structure of the project:
-
-```
-├── node_modules/
-├── public/
-│   ├── holidaze-logo.png
-│   ├── vite.svg
-├── src/
-│   ├── assets/
-│   │   ├── images/
-│   │   └── react.svg
-│   ├── components/
-│   │   ├── CreateBookingModal.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Main.jsx
-│   │   ├── Navbar.jsx
-│   │   ├── Pagination.jsx
-│   │   ├── UpdateAvatarModal.jsx
-│   │   ├── UpdateBooking.jsx
-│   │   ├── UpdateProfileModal.jsx
-│   │   ├── VenueCard.jsx
-│   ├── context/
-│   ├── pages/
-│   │   ├── Accommodations.jsx
-│   │   ├── Contact.jsx
-│   │   ├── CreateVenuePage.jsx
-│   │   ├── Home.jsx
-│   │   ├── Login.jsx
-│   │   ├── ManageBookings.jsx
-│   │   ├── ManageMyVenuesPage.jsx
-│   │   ├── Register.jsx
-│   │   ├── UserBookings.jsx
-│   │   ├── UserDashboard.jsx
-│   │   ├── UserProfile.jsx
-│   │   ├── VenueDetails.jsx
-│   ├── services/
-│   ├── styles/
-│   ├── utils/
-│   ├── App.css
-│   ├── App.jsx
-│   ├── main.jsx
-│   ├── router.jsx
-├── .gitignore
-├── eslint.config.js
-├── index.html
-├── package-lock.json
-├── package.json
-├── postcss.config.cjs
-├── README.md
-├── tailwind.config.js
-├── vite.config.js
-```
-
 ## Key Components
 
 - **AppRouter.jsx**: Manages the routing of the entire application.
@@ -172,15 +117,16 @@ Here is the file structure of the project:
 
 ## Planning and Design Resources
 
-- **Design Prototype**: [Link to Figma prototype]
+- **Mobile Design Prototype**: [Link to Mobile Figma prototype](https://www.figma.com/design/xyEvYW0pLHMCYUqN3H2BOs/Holidaze---Project-Exam?node-id=1-83&t=jmiEe8XOMi3a88wd-1)
+ **Desktop Design Prototype**: [Link to Desktop Figma prototype](https://www.figma.com/design/xyEvYW0pLHMCYUqN3H2BOs/Holidaze---Project-Exam?node-id=0-1&t=jmiEe8XOMi3a88wd-1)
 - **Style Guide**: Contains the chosen color palette, fonts, and component styles based on Tailwind CSS.
-- **Kanban Board**: Managed on GitHub Projects or Trello.
+- **Trello**: [Link to Trello](https://trello.com/invite/b/66f8128b974dbf28ff5e9cc5/ATTI409d6499b88d10e9fdf251c64146b55c1748E8F7/project-exam-2-holidaze)
 
 ## Links
 
 - **GitHub Repository**: [Link to GitHub Repository](https://github.com/lordaake)
-- **Live Demo**: [Link to Live Project on Netlify]
-- **API Documentation**: [Link to API Documentation]
+- **Live Demo**: [Link to Live Project on Netlify](https://holidaze-lordaake-pe.netlify.app/)
+- **API Documentation**: [Link to API Documentation](https://docs.noroff.dev/docs/v2)
 
 ## How to Contribute
 

@@ -29,6 +29,13 @@ function Navbar() {
         setIsMobileMenuOpen(!isMobileMenuOpen); // Toggle mobile menu state
     };
 
+    /**
+     * Closes the mobile menu when a link is clicked.
+     */
+    const closeMobileMenu = () => {
+        setIsMobileMenuOpen(false);
+    };
+
     return (
         <nav className="bg-white shadow-lg fixed w-full z-50 top-0 transition duration-300 ease-in-out transform">
             <div className="container mx-auto flex items-center justify-between p-4">
@@ -36,7 +43,7 @@ function Navbar() {
                 <div className="flex items-center space-x-4">
                     <img src="/holidaze-logo.png" alt="Holidaze Logo" className="h-10 w-auto" />
                     <h1 className="text-3xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">
-                        <Link to="/">Holidaze</Link>
+                        <Link to="/" onClick={closeMobileMenu}>Holidaze</Link>
                     </h1>
                 </div>
 
@@ -117,7 +124,11 @@ function Navbar() {
                                 { to: "/contact", text: "Contact" },
                             ].map((item, index) => (
                                 <li key={index} className="w-full text-center">
-                                    <Link to={item.to} className="block p-2 rounded-md hover:bg-blue-700 transition duration-300">
+                                    <Link
+                                        to={item.to}
+                                        className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
+                                        onClick={closeMobileMenu} // Close mobile menu when link is clicked
+                                    >
                                         {item.text}
                                     </Link>
                                 </li>
@@ -126,13 +137,20 @@ function Navbar() {
                             {isLoggedIn ? (
                                 <>
                                     <li className="w-full text-center">
-                                        <Link to="/user-dashboard" className="block p-2 rounded-md hover:bg-blue-700 transition duration-300">
+                                        <Link
+                                            to="/user-dashboard"
+                                            className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
+                                            onClick={closeMobileMenu} // Close mobile menu when link is clicked
+                                        >
                                             My Page
                                         </Link>
                                     </li>
                                     <li className="w-full text-center">
                                         <button
-                                            onClick={handleLogout}
+                                            onClick={() => {
+                                                handleLogout();
+                                                closeMobileMenu(); // Close mobile menu after logout
+                                            }}
                                             className="w-full p-2 rounded-md hover:bg-blue-700 transition duration-300"
                                         >
                                             Logout
@@ -141,7 +159,11 @@ function Navbar() {
                                 </>
                             ) : (
                                 <li className="w-full text-center">
-                                    <Link to="/login" className="block p-2 rounded-md hover:bg-blue-700 transition duration-300">
+                                    <Link
+                                        to="/login"
+                                        className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
+                                        onClick={closeMobileMenu} // Close mobile menu when link is clicked
+                                    >
                                         Login
                                     </Link>
                                 </li>
