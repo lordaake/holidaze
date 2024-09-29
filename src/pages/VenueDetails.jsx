@@ -404,7 +404,7 @@ function VenueDetails() {
                         </div>
                     </div>
 
-                    <div className="bg-white p-8 rounded-lg shadow-lg">
+                    <div className="bg-white p-4 rounded-lg shadow-lg">
                         {/* Venue Pricing and Capacity */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                             <div className="flex items-center text-gray-800 text-lg md:text-xl">
@@ -483,48 +483,37 @@ function VenueDetails() {
                                 </div>
                             </div>
                         )}
-
                         {/* Booking Section */}
-                        <div className="bg-gray-50 p-6 rounded-lg shadow-inner mt-8">
-                            <h3 className="text-xl md:text-2xl font-semibold text-blue-900 mb-4">
+                        <div className="w-full sm:bg-gray-50 sm:p-6 p-2 rounded-lg shadow-inner">
+                            <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-blue-900 mb-4 text-center">
                                 Book Your Stay
                             </h3>
                             <form className="space-y-6" onSubmit={handleBookingSubmit}>
                                 {/* Date Selection */}
                                 <div>
-                                    <label
-                                        className="block text-gray-700 font-medium mb-2"
-                                        htmlFor="booking-dates"
-                                    >
+                                    <label className="block text-sm sm:text-base text-gray-700 font-medium mb-2 pt-2 flex justify-center" htmlFor="booking-dates">
                                         Select Dates
                                     </label>
-                                    <Calendar
-                                        selectRange
-                                        onChange={setBookingDateRange}
-                                        value={bookingDateRange}
-                                        minDate={new Date()}
-                                        tileDisabled={tileDisabled}
-                                        tileClassName={tileClassName}
-                                        tileContent={tileContent}
-                                        className="mx-auto"
-                                        aria-label="Booking Dates"
-                                    />
-                                    {/* Tooltip for booked dates */}
-                                    <Tooltip id="booked-date-tooltip" />
-                                </div>
-
-                                {/* Total Price Display */}
-                                {totalPrice > 0 && (
-                                    <div className="text-gray-800 font-medium">
-                                        Total Price for{' '}
-                                        {differenceInDays(bookingDateRange[1], bookingDateRange[0])} night(s): $
-                                        {totalPrice.toFixed(2)}
+                                    <div className="w-full">
+                                        <Calendar
+                                            selectRange
+                                            onChange={setBookingDateRange}
+                                            value={bookingDateRange}
+                                            minDate={new Date()}
+                                            tileDisabled={tileDisabled}
+                                            tileClassName={tileClassName}
+                                            tileContent={tileContent}
+                                            className="w-full mx-auto"
+                                            aria-label="Booking Dates"
+                                        />
+                                        {/* Tooltip for booked dates */}
+                                        <Tooltip id="booked-date-tooltip" />
                                     </div>
-                                )}
+                                </div>
 
                                 {/* Number of Guests Input */}
                                 <div>
-                                    <label htmlFor="guests" className="block text-gray-700 font-medium">
+                                    <label htmlFor="guests" className="block text-sm sm:text-base text-gray-700 font-medium">
                                         Number of Guests
                                     </label>
                                     <input
@@ -536,7 +525,7 @@ function VenueDetails() {
                                         onChange={(e) => setGuests(parseInt(e.target.value))}
                                         min="1"
                                         max={maxGuests}
-                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                                        className="w-full px-3 py-2 sm:px-4 sm:py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500"
                                         required
                                     />
                                 </div>
@@ -545,7 +534,7 @@ function VenueDetails() {
                                 <div className="text-center">
                                     <button
                                         type="submit"
-                                        className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200"
+                                        className="bg-blue-600 text-white py-2 sm:py-3 px-4 sm:px-6 rounded-lg shadow-lg hover:bg-blue-700 transition duration-200"
                                         aria-label="Book Now"
                                     >
                                         Book Now
@@ -553,6 +542,7 @@ function VenueDetails() {
                                 </div>
                             </form>
                         </div>
+
                     </div>
                 </div>
             </div>
