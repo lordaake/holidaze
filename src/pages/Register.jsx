@@ -1,7 +1,15 @@
+// src/pages/Register.jsx
+
 import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { registerUser } from '../services/apiService';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
+/**
+ * Reusable input component for forms.
+ * @param {Object} props - Props passed to the component.
+ */
 const FormInput = ({ label, type, name, value, onChange, required, ...props }) => (
     <div className="mb-4">
         <label className="block text-gray-700 mb-2">{label}</label>
@@ -17,6 +25,10 @@ const FormInput = ({ label, type, name, value, onChange, required, ...props }) =
     </div>
 );
 
+/**
+ * Reusable checkbox component for forms.
+ * @param {Object} props - Props passed to the component.
+ */
 const FormCheckbox = ({ label, name, checked, onChange }) => (
     <div className="mb-4">
         <label className="flex items-center">
@@ -32,6 +44,9 @@ const FormCheckbox = ({ label, name, checked, onChange }) => (
     </div>
 );
 
+/**
+ * Registration component for new users.
+ */
 function Register() {
     const [formData, setFormData] = useState({
         name: '',
@@ -45,6 +60,10 @@ function Register() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
+    /**
+     * Handles input changes for both text and checkbox inputs.
+     * @param {Object} e - Event object from the input.
+     */
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData({
@@ -53,6 +72,11 @@ function Register() {
         });
     };
 
+    /**
+     * Handles the registration form submission.
+     * Validates input and communicates with the API service.
+     * @param {Object} e - Event object from the form submission.
+     */
     const handleRegister = async (e) => {
         e.preventDefault();
         const { password, confirmPassword, email, name, avatar, avatarAlt, venueManager } = formData;
@@ -60,24 +84,32 @@ function Register() {
         // Validate passwords match
         if (password !== confirmPassword) {
             setError('Passwords do not match');
+            toast.error('Passwords do not match');
             return;
         }
 
-        // Validate name
-        if (!/^[\w\s]+$/.test(name)) {
-            setError('Name must not contain punctuation symbols apart from underscores (_) and should not be empty');
+        // Validate name (Disallows punctuation except underscore)
+        if (!/^[\w_]+$/.test(name)) {
+            setError(
+                'Name must not contain spaces or punctuation symbols apart from underscores (_) and should not be empty'
+            );
+            toast.error(
+                'Name must not contain spaces or punctuation symbols apart from underscores (_) and should not be empty'
+            );
             return;
         }
 
-        // Validate passwords length
+        // Validate password length
         if (password.length < 8) {
             setError('Password must be at least 8 characters long');
+            toast.error('Password must be at least 8 characters long');
             return;
         }
 
-        // Validate email for venue manager
-        if (venueManager && !email.endsWith('@stud.noroff.no')) {
-            setError('You must use a stud.noroff.no email address to register as a venue manager');
+        // Validate email for all users
+        if (!email.endsWith('@stud.noroff.no')) {
+            setError('You must use a stud.noroff.no email address to register.');
+            toast.error('You must use a stud.noroff.no email address to register.');
             return;
         }
 
@@ -87,12 +119,21 @@ function Register() {
                 const response = await fetch(avatar);
                 if (!response.ok) {
                     setError('Avatar URL must be valid and accessible');
+                    toast.error('Avatar URL must be valid and accessible');
                     return;
                 }
             } catch {
                 setError('Avatar URL must be valid and accessible');
+                toast.error('Avatar URL must be valid and accessible');
                 return;
             }
+        }
+
+        // Ensure avatarAlt is less than 120 characters if provided
+        if (avatarAlt && avatarAlt.length > 120) {
+            setError('Avatar alt text must be less than 120 characters');
+            toast.error('Avatar alt text must be less than 120 characters');
+            return;
         }
 
         // Prepare data for registration
@@ -100,27 +141,56 @@ function Register() {
             name,
             email,
             password,
-            ...(avatar && { avatar: { url: avatar, alt: avatarAlt } }),  // Include avatar only if provided
-            venueManager
+            venueManager,
+            // Include avatar only if avatar URL is provided
+            ...(avatar && {
+                avatar: {
+                    url: avatar,
+                    alt: avatarAlt || '', // Default to empty string if alt text is not provided
+                },
+            }),
         };
 
         try {
             await registerUser(registrationData);
-            // Navigate to user dashboard after successful registration
-            navigate('/dashboard');
+            toast.success('Registration successful! Redirecting to login page...');
+            // Navigate to login page after a short delay to allow the toast to display
+            setTimeout(() => {
+                navigate('/login');
+            }, 2000);
         } catch (error) {
-            const errorMsg = error.response?.data?.message || 'Failed to register user. Please try again.';
+            // Log the error for debugging purposes
+            // console.error('Registration error:', error.response || error.message || error);
+
+            let errorMsg = 'Username or Email may be in use. Try a different username or email.';
+
             setError(errorMsg);
+            toast.error(errorMsg);
         }
     };
 
     return (
         <div className="container mx-auto py-8">
+            {/* Local ToastContainer */}
+            <ToastContainer
+                position="top-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+            />
             <h2 className="text-4xl font-bold mb-6 text-center">Register</h2>
-            <form onSubmit={handleRegister} className="max-w-lg mx-auto bg-white p-8 shadow-lg rounded-lg">
-                {error && <p className="text-red-500">{error}</p>}
+            <form
+                onSubmit={handleRegister}
+                className="max-w-lg mx-auto bg-white p-8 shadow-lg rounded-lg"
+            >
+                {error && <p className="text-red-500 text-center mb-4">{error}</p>}
                 <FormInput
-                    label="Full Name"
+                    label="Username"
                     type="text"
                     name="name"
                     value={formData.name}
@@ -171,12 +241,18 @@ function Register() {
                     checked={formData.venueManager}
                     onChange={handleInputChange}
                 />
-                <button type="submit" className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700">
+                <button
+                    type="submit"
+                    className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition duration-300"
+                >
                     Register
                 </button>
             </form>
             <p className="text-center mt-4">
-                Already have an account? <Link to="/login" className="text-blue-600">Login</Link>
+                Already have an account?{' '}
+                <Link to="/login" className="text-blue-600">
+                    Login
+                </Link>
             </p>
         </div>
     );

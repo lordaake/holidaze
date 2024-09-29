@@ -1,18 +1,19 @@
+// src/services/apiService.js
+
 import axios from 'axios';
 
 const API_URL = 'https://v2.api.noroff.dev'; // Base API URL
 
+/**
+ * Retrieves authentication headers from localStorage.
+ * Throws an error if token or API key is missing.
+ */
 const getHeaders = () => {
     const token = localStorage.getItem('token');
     const apiKey = localStorage.getItem('apiKey');
 
-    // console.log('getHeaders - Token:', token);
-    // console.log('getHeaders - API Key:', apiKey);
-
     if (!token || !apiKey) {
-        console.warn('Missing token or API key.');
-        // Here, optionally throw an error or handle it gracefully
-        throw new Error('Missing token or API key');
+        throw new Error('Authentication error: Missing token or API key.');
     }
 
     return {
@@ -21,38 +22,36 @@ const getHeaders = () => {
     };
 };
 
-
-// Function to monitor and ensure the API key is set in localStorage
+/**
+ * Monitors and ensures the API key is set in localStorage.
+ * If missing, attempts to create and store it.
+ */
 const monitorApiKey = (accessToken) => {
     const intervalId = setInterval(async () => {
-        // Get the current API key from localStorage
         let apiKey = localStorage.getItem('apiKey');
 
-        // If the API key is missing or undefined, create and store it again
         if (!apiKey || apiKey === 'undefined') {
-            console.warn('API Key is missing or undefined. Attempting to create and store the API key again.');
-
             try {
-                // Create a new API key
                 apiKey = await createApiKey(accessToken);
-
-                // Store the new API key in localStorage
                 localStorage.setItem('apiKey', apiKey);
-                // console.log('API Key created and stored by monitor function:', apiKey);
             } catch (error) {
-                console.error('Error creating API key during monitoring:', error);
+                // Handle the error appropriately
             }
         } else {
-            // console.log('API Key is present:', apiKey);
-            // Stop the interval if the API key is present
             clearInterval(intervalId);
         }
     }, 1000);
 };
 
+/**
+ * Logs in a user with given credentials.
+ * Stores necessary data in localStorage upon successful login.
+ * @param {Object} credentials - User's login credentials.
+ * @returns {Object} - Response data from the login API.
+ * @throws Will throw an error if the login fails.
+ */
 export const loginUser = async (credentials) => {
     try {
-        // Make the login request
         const response = await axios.post(`${API_URL}/auth/login`, credentials);
         const { name, email, avatar, banner, accessToken } = response.data.data;
 
@@ -72,33 +71,27 @@ export const loginUser = async (credentials) => {
 
         // Fetch the user profile to get bio and venueManager status
         const userProfile = await getUserProfile();
-        // console.log('Fetched user profile:', userProfile); // For debugging
 
         // Store bio and venueManager status
-        if (typeof userProfile.bio !== 'undefined') {
-            localStorage.setItem('bio', userProfile.bio);
-        } else {
-            localStorage.setItem('bio', '');
-        }
-
-        if (typeof userProfile.venueManager !== 'undefined') {
-            localStorage.setItem('venueManager', userProfile.venueManager.toString());
-        } else {
-            localStorage.setItem('venueManager', 'false'); // Default to false if undefined
-        }
+        localStorage.setItem('bio', userProfile.bio || '');
+        localStorage.setItem('venueManager', userProfile.venueManager ? 'true' : 'false');
 
         return response.data;
     } catch (error) {
-        console.error('Error logging in user:', error.response?.data || error.message);
-        throw error;
+        // Re-throw the error to be handled by the calling component
+        throw extractErrorMessage(error, 'Login failed. Please check your credentials and try again.');
     }
 };
 
-
-
+/**
+ * Creates a new API key using the provided token.
+ * @param {string} token - User's access token.
+ * @returns {string} - Newly created API key.
+ * @throws Will throw an error if API key creation fails.
+ */
 export const createApiKey = async (token) => {
     try {
-        if (!token) throw new Error('No access token found');
+        if (!token) throw new Error('Authentication error: No access token found.');
 
         const response = await axios.post(`${API_URL}/auth/create-api-key`, {}, {
             headers: {
@@ -107,19 +100,20 @@ export const createApiKey = async (token) => {
         });
 
         const apiKey = response.data.data.key;
-        // console.log('API Key created:', apiKey);
         return apiKey;
     } catch (error) {
-        console.error('Error creating API key:', error);
-
-        // Clear localStorage on error
+        // Clear localStorage on error to ensure the user re-authenticates
         localStorage.clear();
-
-        throw error;
+        throw extractErrorMessage(error, 'Failed to create API Key. Please try again.');
     }
 };
 
-// Function to register a new user
+/**
+ * Registers a new user with the provided data.
+ * @param {Object} data - User registration data.
+ * @returns {Object} - Response data from the registration API.
+ * @throws Will throw an error if registration fails.
+ */
 export const registerUser = async (data) => {
     try {
         const apiKey = localStorage.getItem('apiKey') || '';
@@ -130,22 +124,24 @@ export const registerUser = async (data) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error registering user:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Registration failed. Please check your information and try again.');
     }
 };
 
-// Function to get venues managed by the logged-in user, including detailed bookings
+/**
+ * Retrieves venues managed by the logged-in user, including detailed bookings.
+ * @returns {Object} - Response data containing venues.
+ * @throws Will throw an error if fetching venues fails.
+ */
 export const getManagerVenues = async () => {
     try {
         const headers = getHeaders();
         const userName = localStorage.getItem('userName');
 
         if (!userName) {
-            throw new Error('No userName found in localStorage');
+            throw new Error('User information missing. Please log in again.');
         }
 
-        // Updated URL with additional query parameters
         const response = await axios.get(
             `${API_URL}/holidaze/profiles/${userName}/venues`,
             {
@@ -159,65 +155,70 @@ export const getManagerVenues = async () => {
             }
         );
 
-        return response.data; // Adjust based on your API's response structure
+        return response.data;
     } catch (error) {
-        console.error('Error fetching manager venues:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to fetch your venues at this time.');
     }
 };
 
-// Function to get the logged-in user's profile
+/**
+ * Retrieves the logged-in user's profile.
+ * @returns {Object} - User profile data.
+ * @throws Will throw an error if fetching the profile fails.
+ */
 export const getUserProfile = async () => {
     try {
-        const userName = localStorage.getItem('userName'); // Get the logged-in user's name from localStorage
-        if (!userName) throw new Error('No user logged in');
+        const userName = localStorage.getItem('userName');
+        if (!userName) throw new Error('User information missing. Please log in again.');
 
         const response = await axios.get(`${API_URL}/holidaze/profiles/${userName}`, {
-            headers: getHeaders() // Use headers with the token and API key
+            headers: getHeaders()
         });
 
-        // Return the actual user data
         return response.data.data;
     } catch (error) {
-        console.error('Error fetching user profile:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Failed to load user profile.');
     }
 };
 
-// Function to search venues by name and description (server-side)
+/**
+ * Searches venues by name and description on the server-side.
+ * @param {string} query - Search query.
+ * @returns {Array} - Array of matching venues.
+ * @throws Will throw an error if the search fails.
+ */
 export const searchVenues = async (query) => {
     try {
         const response = await axios.get(`${API_URL}/holidaze/venues/search`, {
             params: { q: query },
         });
-        // Extract the venues array from response.data.data
-        return response.data.data; // This should be the array of matching venues
+        return response.data.data;
     } catch (error) {
-        console.error('Error searching venues:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Failed to search venues.');
     }
 };
 
-
-// Function to get a specific venue by ID
+/**
+ * Retrieves a specific venue by ID, optionally including bookings and reviews.
+ * @param {string} id - Venue ID.
+ * @param {boolean} includeBookings - Whether to include bookings.
+ * @param {boolean} includeReviews - Whether to include reviews.
+ * @returns {Object} - Venue data.
+ * @throws Will throw an error if fetching the venue fails.
+ */
 export const getVenueById = async (id, includeBookings = false, includeReviews = false) => {
     try {
-        // Construct query parameters based on flags
         const queryParams = new URLSearchParams();
         if (includeBookings) queryParams.append('_bookings', 'true');
         if (includeReviews) queryParams.append('_reviews', 'true');
 
-        // Construct the full URL with query parameters
         const url = `${API_URL}/holidaze/venues/${id}${queryParams.toString() ? `?${queryParams.toString()}` : ''}`;
 
-        // Retrieve token and API key from localStorage
         const token = localStorage.getItem('token');
         const apiKey = localStorage.getItem('apiKey');
 
-        // Initialize headers object
         let headers = {};
 
-        // Conditionally include headers only if both token and API key are present
         if (token && apiKey) {
             headers = {
                 Authorization: `Bearer ${token}`,
@@ -225,36 +226,40 @@ export const getVenueById = async (id, includeBookings = false, includeReviews =
             };
         }
 
-        // Make the GET request with headers if available
         const response = await axios.get(url, {
             headers: Object.keys(headers).length > 0 ? headers : undefined,
         });
 
         return response.data;
     } catch (error) {
-        console.error(
-            `Failed to fetch data for venue with ID ${id}:`,
-            error.response?.data || error.message
-        );
-        throw error;
+        throw extractErrorMessage(error, `Unable to fetch details for venue ID ${id}.`);
     }
 };
 
-// Function to get all venues
-export const getAllVenues = async () => {
+/**
+ * Fetches all venues with optional additional fields (like owner, bookings).
+ * @param {Object} options - Query parameters for additional data (like `_owner`, `_bookings`).
+ * @returns {Array} - Array of all venues.
+ */
+export const getAllVenues = async (options = {}) => {
     try {
-        const response = await axios.get(`${API_URL}/holidaze/venues`);
-        // Extract the venues array from response.data.data
-        return response.data.data; // This should be the array of venues
+        const params = new URLSearchParams();
+        if (options.includeOwner) params.append('_owner', true);
+        if (options.includeBookings) params.append('_bookings', true);
+
+        const response = await axios.get(`${API_URL}/holidaze/venues`, { params });
+        return response.data.data;
     } catch (error) {
-        console.error('Error fetching venues:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to fetch venues.');
     }
 };
 
-
-
-// Function to get bookings for a specific venue by venueId
+/**
+ * Retrieves bookings for a specific venue by venueId.
+ * @param {string} venueId - Venue ID.
+ * @returns {Array} - Array of bookings for the venue.
+ * @throws Will throw an error if fetching bookings fails.
+ */
 export const getVenueBookings = async (venueId) => {
     try {
         const response = await axios.get(`${API_URL}/holidaze/bookings`, {
@@ -263,12 +268,16 @@ export const getVenueBookings = async (venueId) => {
         const filteredBookings = response.data.data.filter(booking => booking.venue.id === venueId);
         return filteredBookings;
     } catch (error) {
-        console.error(`Error fetching bookings for venue ID ${venueId}:`, error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, `Unable to fetch bookings for venue ID ${venueId}.`);
     }
 };
 
-// Function to get bookings for a specific venue using the dedicated endpoint
+/**
+ * Retrieves bookings for a specific venue using the dedicated endpoint.
+ * @param {string} venueId - Venue ID.
+ * @returns {Array} - Array of bookings for the venue.
+ * @throws Will throw an error if fetching bookings fails.
+ */
 export const getBookingsByVenueId = async (venueId) => {
     try {
         const response = await axios.get(`${API_URL}/holidaze/venues/${venueId}/bookings`, {
@@ -276,15 +285,16 @@ export const getBookingsByVenueId = async (venueId) => {
         });
         return response.data.data;
     } catch (error) {
-        console.error(
-            `Error fetching bookings for venue ID ${venueId}:`,
-            error.response?.data || error.message
-        );
-        throw error;
+        throw extractErrorMessage(error, `Unable to fetch bookings for venue ID ${venueId}.`);
     }
 };
 
-// Function to get a specific venue by ID including bookings
+/**
+ * Retrieves a specific venue by ID, including bookings.
+ * @param {string} id - Venue ID.
+ * @returns {Object} - Venue data including bookings.
+ * @throws Will throw an error if fetching the venue fails.
+ */
 export const getVenueByIdWithBookings = async (id) => {
     try {
         const headers = getHeaders();
@@ -293,12 +303,16 @@ export const getVenueByIdWithBookings = async (id) => {
         });
         return response.data;
     } catch (error) {
-        console.error(`Error fetching venue with ID ${id}:`, error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, `Unable to fetch venue with ID ${id}.`);
     }
 };
 
-// Function to get bookings by user profile
+/**
+ * Retrieves bookings by user profile.
+ * @param {string} userName - User's username.
+ * @returns {Object} - User's bookings.
+ * @throws Will throw an error if fetching bookings fails.
+ */
 export const getUserBookings = async (userName) => {
     try {
         const headers = getHeaders();
@@ -308,12 +322,15 @@ export const getUserBookings = async (userName) => {
         );
         return response.data;
     } catch (error) {
-        console.error(`Error fetching bookings for user ${userName}:`, error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, `Unable to fetch bookings for user ${userName}.`);
     }
 };
 
-// Function to delete a booking
+/**
+ * Deletes a booking by booking ID.
+ * @param {string} bookingId - Booking ID.
+ * @throws Will throw an error if deleting the booking fails.
+ */
 export const deleteBooking = async (bookingId) => {
     try {
         const headers = getHeaders();
@@ -324,12 +341,17 @@ export const deleteBooking = async (bookingId) => {
             throw new Error('Failed to delete booking.');
         }
     } catch (error) {
-        console.error(`Error deleting booking with ID ${bookingId}:`, error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, `Unable to delete booking ID ${bookingId}.`);
     }
 };
 
-// Function to update a booking
+/**
+ * Updates a booking by booking ID.
+ * @param {string} bookingId - Booking ID.
+ * @param {Object} bookingData - Data to update the booking.
+ * @returns {Object} - Updated booking data.
+ * @throws Will throw an error if updating the booking fails.
+ */
 export const updateBooking = async (bookingId, bookingData) => {
     try {
         const headers = getHeaders();
@@ -340,14 +362,16 @@ export const updateBooking = async (bookingId, bookingData) => {
         );
         return response.data;
     } catch (error) {
-        console.error(`Error updating booking with ID ${bookingId}:`, error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, `Unable to update booking ID ${bookingId}.`);
     }
 };
 
-
-
-// Function to get venues created by the logged-in user
+/**
+ * Retrieves venues created by the logged-in user.
+ * @param {string} username - User's username.
+ * @returns {Object} - User's venues.
+ * @throws Will throw an error if fetching venues fails.
+ */
 export const getUserVenues = async (username) => {
     try {
         const response = await axios.get(`${API_URL}/holidaze/profiles/${username}/venues`, {
@@ -355,12 +379,17 @@ export const getUserVenues = async (username) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error fetching user venues:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to fetch your venues.');
     }
 };
 
-// Function to update a venue
+/**
+ * Updates a venue by venue ID.
+ * @param {string} id - Venue ID.
+ * @param {Object} venueData - Data to update the venue.
+ * @returns {Object} - Updated venue data.
+ * @throws Will throw an error if updating the venue fails.
+ */
 export const updateVenue = async (id, venueData) => {
     try {
         const response = await axios.put(`${API_URL}/holidaze/venues/${id}`, venueData, {
@@ -368,59 +397,61 @@ export const updateVenue = async (id, venueData) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error updating venue:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to update venue.');
     }
 };
 
-// Function to delete a venue
+/**
+ * Deletes a venue by venue ID.
+ * @param {string} id - Venue ID.
+ * @throws Will throw an error if deleting the venue fails.
+ */
 export const deleteVenue = async (id) => {
     try {
         await axios.delete(`${API_URL}/holidaze/venues/${id}`, {
-            headers: getHeaders() // Include token and API key
+            headers: getHeaders()
         });
     } catch (error) {
-        console.error('Error deleting venue:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to delete venue.');
     }
 };
 
-// Function to update the user's profile
+/**
+ * Updates the user's profile.
+ * @param {Object} profileData - Data to update the profile.
+ * @returns {Object} - Updated profile data.
+ * @throws Will throw an error if updating the profile fails.
+ */
 export const updateUserProfile = async (profileData) => {
     try {
         const profileName = localStorage.getItem('userName');
         if (!profileName) {
-            throw new Error('No userName found in localStorage');
+            throw new Error('User information missing. Please log in again.');
         }
 
         const endpoint = `${API_URL}/holidaze/profiles/${encodeURIComponent(profileName)}`;
-        // console.log('Attempting to update profile at endpoint:', endpoint);
 
         const response = await axios.put(endpoint, profileData, { headers: getHeaders() });
         return response.data;
     } catch (error) {
-        console.error('Error updating profile:', error.response?.data || error.message);
-
-        // Log detailed error information
-        if (error.response && error.response.data) {
-            console.error('Error details:', JSON.stringify(error.response.data, null, 2));
-        }
-
-        throw error;
+        throw extractErrorMessage(error, 'Unable to update your profile.');
     }
 };
 
-
-// Function to update the user's avatar
+/**
+ * Updates the user's avatar.
+ * @param {Object} avatarData - Data for the new avatar.
+ * @returns {Object} - Updated avatar data.
+ * @throws Will throw an error if updating the avatar fails.
+ */
 export const updateUserAvatar = async (avatarData) => {
     try {
         const profileName = localStorage.getItem('userName');
         if (!profileName) {
-            throw new Error('No userName found in localStorage');
+            throw new Error('User information missing. Please log in again.');
         }
 
         const endpoint = `${API_URL}/holidaze/profiles/${encodeURIComponent(profileName)}`;
-        // console.log('Attempting to update avatar at endpoint:', endpoint);
 
         const response = await axios.put(
             endpoint,
@@ -429,23 +460,21 @@ export const updateUserAvatar = async (avatarData) => {
         );
         return response.data;
     } catch (error) {
-        console.error('Error updating avatar:', error.response?.data || error.message);
-
-        // Log detailed error information
-        if (error.response && error.response.data) {
-            console.error('Error details:', JSON.stringify(error.response.data, null, 2));
-        }
-
-        throw error;
+        throw extractErrorMessage(error, 'Unable to update your avatar.');
     }
 };
 
-
+/**
+ * Creates a new venue.
+ * @param {Object} venueData - Data for the new venue.
+ * @returns {Object} - Created venue data.
+ * @throws Will throw an error if creating the venue fails.
+ */
 export const createVenue = async (venueData) => {
     try {
         const headers = getHeaders();
         if (!headers.Authorization || !headers['X-Noroff-API-Key']) {
-            throw new Error('Missing authorization or API key for creating venue.');
+            throw new Error('Authorization error: Missing token or API key for creating venue.');
         }
 
         const response = await axios.post(`${API_URL}/holidaze/venues`, venueData, {
@@ -453,19 +482,23 @@ export const createVenue = async (venueData) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error creating venue:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to create venue.');
     }
 };
 
-// Function to create a new booking
+/**
+ * Creates a new booking.
+ * @param {Object} bookingData - Data for the new booking.
+ * @returns {Object} - Created booking data.
+ * @throws Will throw an error if creating the booking fails.
+ */
 export const createBooking = async (bookingData) => {
     try {
         const token = localStorage.getItem('token');
         const apiKey = localStorage.getItem('apiKey');
 
         if (!token || !apiKey) {
-            throw new Error('User is not authenticated.');
+            throw new Error('Authentication error: You need to log in to make a booking.');
         }
 
         const headers = {
@@ -479,11 +512,21 @@ export const createBooking = async (bookingData) => {
         });
         return response.data;
     } catch (error) {
-        console.error('Error creating booking:', error.response?.data || error.message);
-        throw error;
+        throw extractErrorMessage(error, 'Unable to create booking. Please try again.');
     }
 };
 
-
+/**
+ * Extracts a meaningful error message from the Axios error object.
+ * @param {Object} error - Axios error object.
+ * @param {string} defaultMessage - Default message if none found.
+ * @returns {string} - Extracted error message.
+ */
+const extractErrorMessage = (error, defaultMessage) => {
+    if (error.response && error.response.data && error.response.data.errors && error.response.data.errors.length > 0) {
+        return error.response.data.errors[0].message;
+    }
+    return defaultMessage;
+};
 
 export { getHeaders };
