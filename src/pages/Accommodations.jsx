@@ -232,15 +232,6 @@ function Accommodations() {
     };
 
     /**
-     * Resets the filter state to show all accommodations.
-     */
-    const resetFilter = () => {
-        setFilteredVenues([]);
-        setIsFiltering(false);
-        setCurrentPageAll(1);
-    };
-
-    /**
      * Debounced search function to handle user input with a delay.
      */
     const debouncedSearch = useMemo(
@@ -314,6 +305,15 @@ function Accommodations() {
             debouncedSearch.cancel();
         };
     }, [debouncedSearch]);
+
+    /**
+   * Resets the filter state to show all accommodations.
+   */
+    const resetFilter = () => {
+        setFilteredVenues([]);
+        setIsFiltering(false);
+        setCurrentPageAll(1);
+    };
 
     /**
      * Resets the search state to show all accommodations.
@@ -420,7 +420,6 @@ function Accommodations() {
                     )}
                 </div>
             )}
-
 
             {/* **Error Message** */}
             {error && <div className="mb-8 text-center text-red-500">{error}</div>}

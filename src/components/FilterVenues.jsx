@@ -222,10 +222,10 @@ function FilterVenues({ onFilterChange }) {
                             Apply Filters
                         </button>
                         <button
-                            className="bg-red-500 text-white py-2 px-4 rounded-lg"
+                            className="bg-blue-500 text-white py-2 px-4 rounded-lg"
                             onClick={resetFilters}
                         >
-                            Reset Filters
+                            Show All Venues
                         </button>
                     </div>
                 </div>
