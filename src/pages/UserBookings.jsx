@@ -159,7 +159,7 @@ function UserBookings() {
             {bookings.length === 0 ? (
                 <p className="text-center text-gray-700">You have no bookings.</p>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 text-black">
                     {bookings.map((booking) => (
                         <div key={booking.id} className="bg-white p-6 rounded-lg shadow-md">
                             <img
