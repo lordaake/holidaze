@@ -233,7 +233,7 @@ function CreateVenuePage() {
     }
 
     return (
-        <div className="container mx-auto py-12">
+        <div className="container mx-auto py-12 text-black">
             {/* Local ToastContainer for displaying notifications */}
             <ToastContainer
                 position="top-right"
@@ -248,7 +248,7 @@ function CreateVenuePage() {
             />
             <div className={`max-w-3xl mx-auto shadow-lg rounded-lg p-8 ${isEditMode ? 'bg-yellow-100' : 'bg-white'}`}>
                 {/* Form Title */}
-                <h2 className="text-3xl font-bold mb-6 text-center">
+                <h2 className="text-2xl sm:text-3xl font-bold mb-6 text-center">
                     {isEditMode ? 'Edit Venue' : 'Create a New Venue'}
                 </h2>
                 {/* Display error message if any */}
