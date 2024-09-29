@@ -17,6 +17,8 @@ function UserBookings() {
     const { user } = useContext(AuthContext);  // Access the current user from AuthContext
     const [bookings, setBookings] = useState([]);  // State to store the user's bookings
     const [loading, setLoading] = useState(true);  // State to manage loading status
+    const [showDeleteModal, setShowDeleteModal] = useState(false); // Show delete confirmation modal
+    const [bookingToDelete, setBookingToDelete] = useState(null); // The booking to delete
     const navigate = useNavigate();  // Hook to navigate programmatically
 
     /**
@@ -44,21 +46,37 @@ function UserBookings() {
     };
 
     /**
-     * Deletes a booking by its ID and removes it from the state.
-     * Displays a confirmation prompt and handles errors.
+     * Opens the delete confirmation modal for the selected booking.
      *
      * @param {string} bookingId - The ID of the booking to delete.
      */
-    const handleDeleteBooking = async (bookingId) => {
-        if (window.confirm('Are you sure you want to delete this booking?')) {
-            try {
-                await deleteBooking(bookingId);  // API call to delete booking
-                setBookings(bookings.filter((booking) => booking.id !== bookingId));  // Remove the deleted booking from state
-                toast.success('Booking deleted successfully.');  // Show success message
-            } catch (error) {
-                toast.error('Failed to delete the booking. Please try again later.');  // Show error message if deletion fails
-            }
+    const handleDeleteClick = (bookingId) => {
+        setBookingToDelete(bookingId);
+        setShowDeleteModal(true);
+    };
+
+    /**
+     * Confirms the deletion of the booking and calls the API.
+     */
+    const confirmDelete = async () => {
+        try {
+            await deleteBooking(bookingToDelete);  // API call to delete booking
+            setBookings(bookings.filter((booking) => booking.id !== bookingToDelete));  // Remove the deleted booking from state
+            toast.success('Booking deleted successfully.');  // Show success message
+        } catch (error) {
+            toast.error('Failed to delete the booking. Please try again later.');  // Show error message if deletion fails
+        } finally {
+            setShowDeleteModal(false);
+            setBookingToDelete(null);
         }
+    };
+
+    /**
+     * Cancels the deletion and closes the modal.
+     */
+    const cancelDelete = () => {
+        setShowDeleteModal(false);
+        setBookingToDelete(null);
     };
 
     /**
@@ -96,6 +114,32 @@ function UserBookings() {
                 draggable
                 pauseOnHover
             />
+
+            {/* Delete Confirmation Modal */}
+            {showDeleteModal && (
+                <div className="fixed inset-0 flex items-center justify-center z-50 bg-black bg-opacity-50">
+                    <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+                        <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
+                        <p className="mb-6">
+                            Are you sure you want to delete this booking? This action cannot be undone.
+                        </p>
+                        <div className="flex justify-end space-x-4">
+                            <button
+                                onClick={cancelDelete}
+                                className="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                onClick={confirmDelete}
+                                className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500"
+                            >
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Header Section with Title and Back Button */}
             <div className="flex justify-between items-center mb-6">
@@ -145,7 +189,7 @@ function UserBookings() {
                                         <FaEdit />  {/* Edit icon for updating booking */}
                                     </button>
                                     <button
-                                        onClick={() => handleDeleteBooking(booking.id)}
+                                        onClick={() => handleDeleteClick(booking.id)}
                                         className="text-red-600 hover:text-red-800"
                                     >
                                         <FaTrash />  {/* Trash icon for deleting booking */}
