@@ -359,7 +359,7 @@ function VenueDetails() {
                 pauseOnHover
             />
             <div className="relative bg-gray-100 py-12">
-                <div className="container mx-auto px-4 lg:px-8">
+                <div className="container mx-auto sm:px-4 px-2 lg:px-8">
 
                     {/* Close Button (X Icon) */}
                     <button
@@ -404,7 +404,7 @@ function VenueDetails() {
                         </div>
                     </div>
 
-                    <div className="bg-white p-4 rounded-lg shadow-lg">
+                    <div className="bg-white sm:p-6 p-4 rounded-lg shadow-lg">
                         {/* Venue Pricing and Capacity */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-6">
                             <div className="flex items-center text-gray-800 text-lg md:text-xl">
@@ -484,7 +484,7 @@ function VenueDetails() {
                             </div>
                         )}
                         {/* Booking Section */}
-                        <div className="w-full sm:bg-gray-50 sm:p-6 p-2 rounded-lg shadow-inner">
+                        <div className="w-full sm:bg-gray-50 sm:p-6 p-0 pt-4 rounded-lg sm:shadow-inner">
                             <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-blue-900 mb-4 text-center">
                                 Book Your Stay
                             </h3>
