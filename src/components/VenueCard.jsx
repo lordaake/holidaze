@@ -47,7 +47,7 @@ function VenueCard({ venue, topRated = false }) {
             </div>
             <div className="p-6 bg-gray-50">
                 {/* Display the venue name, or 'Unnamed Venue' if not available */}
-                <h3 className="text-2xl font-semibold mb-3 truncate">{venue.name || 'Unnamed Venue'}</h3>
+                <h3 className="text-2xl font-semibold mb-3 truncate text-black">{venue.name || 'Unnamed Venue'}</h3>
                 <div className="flex items-center mb-2">
                     <span className="text-yellow-500 text-2xl mr-1">
                         <FaStar />
