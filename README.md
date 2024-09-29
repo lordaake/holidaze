@@ -124,7 +124,7 @@ You can view my GitHub profile [here](https://github.com/lordaake).
 
 ## Links
 
-- **GitHub Repository**: [Link to GitHub Repository](https://github.com/lordaake)
+- **GitHub Repository**: [Link to GitHub Repository](https://github.com/lordaake/holidaze)
 - **Live Demo**: [Link to Live Project on Netlify](https://holidaze-lordaake-pe.netlify.app/)
 - **API Documentation**: [Link to API Documentation](https://docs.noroff.dev/docs/v2)
 
