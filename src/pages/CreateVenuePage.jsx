@@ -392,7 +392,7 @@ function CreateVenuePage() {
                     {/* Amenities Checkboxes */}
                     <div className="mb-4">
                         <label className="block text-gray-700 mb-2">Amenities</label>
-                        <div className="flex flex-wrap space-x-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                             {['wifi', 'parking', 'breakfast', 'pets'].map((amenity) => (
                                 <label key={amenity} className="flex items-center space-x-2">
                                     <input
@@ -406,6 +406,7 @@ function CreateVenuePage() {
                             ))}
                         </div>
                     </div>
+
 
                     {/* Images Input Fields */}
                     <div className="mb-4">
@@ -442,7 +443,7 @@ function CreateVenuePage() {
                     </div>
 
                     {/* Form Action Buttons */}
-                    <div className="flex justify-end space-x-4">
+                    <div className="flex justify-start space-x-4 pt-2">
                         {/* Cancel button navigates back to user dashboard */}
                         <button
                             type="button"

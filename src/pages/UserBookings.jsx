@@ -179,20 +179,20 @@ function UserBookings() {
                             <div className="flex justify-between mt-4">
                                 <button
                                     onClick={() => navigate(`/venues/${booking.venue.id}`)}
-                                    className="text-blue-600 hover:underline"
+                                    className="text-blue-600 hover:underline text-lg"
                                 >
                                     View Venue
                                 </button>
-                                <div className="flex space-x-2">
+                                <div className="flex space-x-4">
                                     <button
                                         onClick={() => handleUpdateBooking(booking)}
-                                        className="text-green-600 hover:text-green-800"
+                                        className="text-green-600 hover:text-green-800 text-xl p-2 rounded-md"
                                     >
                                         <FaEdit />  {/* Edit icon for updating booking */}
                                     </button>
                                     <button
                                         onClick={() => handleDeleteClick(booking.id)}
-                                        className="text-red-600 hover:text-red-800"
+                                        className="text-red-600 hover:text-red-800 text-xl p-2 rounded-md"
                                     >
                                         <FaTrash />  {/* Trash icon for deleting booking */}
                                     </button>
