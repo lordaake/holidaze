@@ -59,7 +59,7 @@ const Contact = () => {
     };
 
     return (
-        <div className="container mx-auto py-12 px-6">
+        <div className="container mx-auto sm:py-12 sm:px-6 px-0  pt-6">
             {/* Page Title */}
             <h2 className="text-4xl font-bold text-center mb-8 text-blue-900">Contact Us</h2>
 
