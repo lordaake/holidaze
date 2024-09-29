@@ -86,7 +86,7 @@ function FilterVenues({ onFilterChange }) {
     }, []);
 
     return (
-        <div className="mb-4">
+        <div className="mb-4 text-black">
             {/* Toggle Filter Button */}
             <button
                 className="bg-blue-500 text-white py-2 px-4 rounded-lg"
