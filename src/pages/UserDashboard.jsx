@@ -65,7 +65,7 @@ function UserDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 py-8 px-4 sm:px-6 lg:px-8">
+        <div className="min-h-screen bg-gray-100 sm:py-8 px-2 pt-4 sm:px-6 lg:px-8">
             <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
                 {/* Banner Section */}
                 <div className="relative">
