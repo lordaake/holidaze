@@ -379,7 +379,7 @@ function Accommodations() {
             />
 
             {/* **Search Bar** */}
-            <div className="mb-12 flex justify-center relative">
+            <div className="mb-6 flex justify-center relative">
                 <input
                     type="text"
                     value={searchQuery}
@@ -400,7 +400,7 @@ function Accommodations() {
 
             {/* **Filter Component** */}
             {!isSearching && (
-                <div className="mb-12 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 relative sm:space-x-4 sm:items-start">
+                <div className="mb-12 flex flex-col sm:flex-row justify-between sm:justify-center items-center space-y-4 sm:space-y-0 relative sm:space-x-4 sm:items-start">
                     {/* Filter Input Section */}
                     <div className="w-full sm:w-auto">
                         <FilterVenues onFilterChange={handleFilterChange} />
