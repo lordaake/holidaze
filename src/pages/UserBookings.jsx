@@ -142,16 +142,18 @@ function UserBookings() {
             )}
 
             {/* Header Section with Title and Back Button */}
-            <div className="flex justify-between items-center mb-6">
-                <h2 className="text-2xl font-bold text-gray-800">My Bookings</h2>
+            <div className="grid grid-cols-1 sm:grid-cols-3 items-center mb-6 gap-4">
                 <button
                     onClick={handleBackToDashboard}
-                    className="flex items-center bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 transition-colors"
+                    className="flex items-center bg-gray-500 text-white px-3 py-2 rounded hover:bg-gray-600 transition-colors justify-self-center sm:justify-self-start"
                 >
-                    <FaArrowLeft className="mr-2" />  {/* Left-pointing arrow icon */}
+                    <FaArrowLeft className="mr-2" />
                     Back to Dashboard
                 </button>
+                <h2 className="text-2xl font-bold text-gray-800 text-center sm:col-start-2">My Bookings</h2>
             </div>
+
+
 
             {/* If no bookings are available, display a message */}
             {bookings.length === 0 ? (
