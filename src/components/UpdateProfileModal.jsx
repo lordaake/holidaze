@@ -127,7 +127,7 @@ function UpdateProfileModal({ onClose, onUpdate, currentData }) {
     return (
         <>
             <div
-                className="fixed inset-0 flex items-center justify-center z-50"
+                className="fixed inset-0 flex items-center justify-center z-50 text-black"
                 role="dialog"
                 aria-modal="true"
                 aria-labelledby="update-profile-title"

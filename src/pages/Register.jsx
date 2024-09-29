@@ -170,7 +170,7 @@ function Register() {
     };
 
     return (
-        <div className="container mx-auto py-8">
+        <div className="container mx-auto py-8 text-black">
             {/* Local ToastContainer */}
             <ToastContainer
                 position="top-right"
@@ -248,7 +248,7 @@ function Register() {
                     Register
                 </button>
             </form>
-            <p className="text-center mt-4">
+            <p className="text-center mt-4 text-black">
                 Already have an account?{' '}
                 <Link to="/login" className="text-blue-600">
                     Login
