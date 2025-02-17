@@ -58,3 +58,65 @@ html {
   font-size: 1.5rem;
   cursor: pointer;
 }
+
+/* Custom Calendar Styling */
+.react-calendar-custom {
+  @apply border-gray-200 rounded-xl overflow-hidden shadow-sm;
+
+  .react-calendar__tile--active {
+    @apply bg-blue-500 text-white;
+  }
+
+  .react-calendar__tile--now {
+    @apply bg-amber-100;
+  }
+
+  .booked-date {
+    @apply bg-red-100 text-red-500 line-through cursor-not-allowed;
+  }
+
+  .react-calendar__navigation button:disabled {
+    @apply bg-gray-50;
+  }
+
+  .react-calendar__tile {
+    @apply p-3 sm:p-4 transition-colors;
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.8;
+  }
+
+  50% {
+    transform: translateY(-20px) translateX(10px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateY(0) translateX(0);
+    opacity: 0.8;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-float {
+  animation: float 8s infinite ease-in-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.8s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}

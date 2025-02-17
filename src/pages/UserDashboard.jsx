@@ -9,9 +9,6 @@ import UpdateProfileModal from '../components/UpdateProfileModal';
  * UserDashboard component serves as the main dashboard for authenticated users.
  * It displays user information, provides navigation to various user-related actions,
  * and allows users to update their profiles.
- *
- * @component
- * @returns {JSX.Element} The rendered UserDashboard component.
  */
 function UserDashboard() {
     const navigate = useNavigate();
@@ -30,7 +27,7 @@ function UserDashboard() {
     // State to control the visibility of the UpdateProfileModal component
     const [isProfileModalOpen, setIsProfileModalOpen] = useState(false);
 
-    // Updates the userData state when the user object from AuthContext changes
+    // Update userData when the user object from AuthContext changes
     useEffect(() => {
         if (user) {
             setUserData({
@@ -44,7 +41,7 @@ function UserDashboard() {
         }
     }, [user]);
 
-    // Handles user logout by invoking logout function from AuthContext and navigating to login page
+    // Handle user logout by invoking logout function from AuthContext and navigating to login page
     const handleLogout = () => {
         logout();
         navigate('/login');
@@ -65,40 +62,40 @@ function UserDashboard() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 sm:py-8 px-2 pt-4 sm:px-6 lg:px-8">
-            <div className="max-w-5xl mx-auto bg-white shadow-xl rounded-2xl overflow-hidden">
+        <div className="min-h-screen bg-gradient-to-br from-blue-100 to-purple-100 py-8 px-4 sm:px-6 lg:px-8">
+            <div className="max-w-5xl mx-auto bg-white/90 backdrop-blur-sm shadow-2xl rounded-2xl overflow-hidden">
                 {/* Banner Section */}
                 <div className="relative">
                     {userData.banner?.url ? (
                         <img
                             src={userData.banner.url}
                             alt={userData.banner.alt || 'User banner'}
-                            className="w-full h-40 md:h-64 object-cover"
+                            className="w-full h-48 md:h-64 object-cover"
                             loading="lazy"
                         />
                     ) : (
                         <div
-                            className="w-full h-40 md:h-64 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
+                            className="w-full h-48 md:h-64 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"
                             aria-label="Default Banner Background"
                         ></div>
                     )}
-                    <div className="absolute bottom-0 left-0 p-4 md:p-6 bg-gradient-to-t from-black/70 to-transparent w-full">
+                    <div className="absolute bottom-0 left-0 p-4 md:p-6 bg-gradient-to-t from-black/80 to-transparent w-full">
                         <div className="flex items-center">
                             {userData.avatar?.url ? (
                                 <img
                                     src={userData.avatar.url}
                                     alt={userData.avatar.alt || 'User avatar'}
-                                    className="w-16 h-16 md:w-24 md:h-24 rounded-full border-4 border-white shadow-md"
+                                    className="w-20 h-20 md:w-28 md:h-28 rounded-full border-4 border-white shadow-xl"
                                     loading="lazy"
                                 />
                             ) : (
                                 <div
-                                    className="w-16 h-16 md:w-24 md:h-24 bg-gray-300 rounded-full"
+                                    className="w-20 h-20 md:w-28 md:h-28 bg-gray-300 rounded-full"
                                     aria-label="Default Avatar"
                                 ></div>
                             )}
                             <div className="ml-4">
-                                <h3 className="text-xl md:text-3xl font-bold text-white">
+                                <h3 className="text-xl md:text-3xl font-bold text-white drop-shadow-lg">
                                     {userData.name}
                                 </h3>
                             </div>
@@ -109,12 +106,10 @@ function UserDashboard() {
                 {/* Content Section */}
                 <div className="p-6 md:p-12">
                     <div className="text-center mb-8 md:mb-10">
-                        <h2 className="text-2xl md:text-4xl font-semibold text-gray-800">
+                        <h2 className="text-2xl md:text-4xl font-extrabold text-gray-800">
                             {userData.name}
                         </h2>
-                        <p className="text-gray-600 text-sm md:text-lg mt-2">
-                            {userData.email}
-                        </p>
+                        <p className="text-gray-600 text-sm md:text-lg mt-2">{userData.email}</p>
                         {userData.bio && (
                             <p className="mt-4 text-gray-700 max-w-md sm:max-w-lg md:max-w-2xl mx-auto">
                                 {userData.bio}
@@ -153,11 +148,7 @@ function UserDashboard() {
                             color="orange"
                             onClick={() => setIsProfileModalOpen(true)}
                         />
-                        <ActionButton
-                            label="Logout"
-                            color="red"
-                            onClick={handleLogout}
-                        />
+                        <ActionButton label="Logout" color="red" onClick={handleLogout} />
                     </div>
                 </div>
             </div>
@@ -176,28 +167,20 @@ function UserDashboard() {
 /**
  * ActionButton component renders a stylized button used for various user actions
  * within the UserDashboard. It accepts a label, color, and an onClick handler as props.
- *
- * @component
- * @param {Object} props - The component props.
- * @param {string} props.label - The text to display on the button.
- * @param {string} props.color - The color theme of the button (e.g., blue, red).
- * @param {Function} props.onClick - The function to execute on button click.
- * @returns {JSX.Element} The rendered ActionButton component.
  */
 function ActionButton({ label, color, onClick }) {
     const colorClasses = {
-        blue: 'bg-blue-800 hover:bg-blue-900 focus:ring-blue-700',
-        green: 'bg-green-700 hover:bg-green-800 focus:ring-green-600',
-        purple: 'bg-purple-700 hover:bg-purple-800 focus:ring-purple-600',
-        yellow: 'bg-yellow-900 hover:bg-yellow-700 focus:ring-yellow-600',
-        teal: 'bg-teal-700 hover:bg-teal-800 focus:ring-teal-600',
-        orange: 'bg-orange-900 hover:bg-orange-700 focus:ring-orange-600',
-        red: 'bg-red-700 hover:bg-red-800 focus:ring-red-600',
+        blue: 'bg-gradient-to-r from-blue-700 to-blue-800 hover:from-blue-800 hover:to-blue-900 focus:ring-blue-700',
+        green: 'bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 focus:ring-green-600',
+        purple: 'bg-gradient-to-r from-purple-600 to-purple-700 hover:from-purple-700 hover:to-purple-800 focus:ring-purple-600',
+        yellow: 'bg-gradient-to-r from-yellow-600 to-yellow-700 hover:from-yellow-700 hover:to-yellow-800 focus:ring-yellow-600',
+        teal: 'bg-gradient-to-r from-teal-600 to-teal-700 hover:from-teal-700 hover:to-teal-800 focus:ring-teal-600',
+        orange: 'bg-gradient-to-r from-orange-600 to-orange-700 hover:from-orange-700 hover:to-orange-800 focus:ring-orange-600',
+        red: 'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 focus:ring-red-600',
     };
 
     const buttonClasses =
-        colorClasses[color] ||
-        'bg-gray-500 hover:bg-gray-600 focus:ring-gray-500';
+        colorClasses[color] || 'bg-gray-500 hover:bg-gray-600 focus:ring-gray-500';
 
     return (
         <button

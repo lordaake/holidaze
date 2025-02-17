@@ -4,173 +4,206 @@ import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 
-/**
- * Navbar component that provides navigation links and user authentication options.
- * Handles mobile and desktop navigation, login/logout functionality, and displays different menus based on user authentication state.
- */
 function Navbar() {
-    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // State to control mobile menu visibility
-    const { isLoggedIn, logout } = useContext(AuthContext); // Access login status and logout function from AuthContext
-    const navigate = useNavigate(); // Hook for navigating to different routes
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { isLoggedIn, logout } = useContext(AuthContext);
+    const navigate = useNavigate();
 
-    /**
-     * Handles the logout process.
-     * Logs the user out and redirects them to the homepage.
-     */
     const handleLogout = () => {
         logout();
-        navigate('/'); // Redirect to home page after logging out
+        navigate('/');
     };
 
-    /**
-     * Toggles the visibility of the mobile menu.
-     */
-    const handleMobileMenuToggle = () => {
-        setIsMobileMenuOpen(!isMobileMenuOpen); // Toggle mobile menu state
+    const toggleMobileMenu = () => {
+        setIsMobileMenuOpen((prev) => !prev);
     };
 
-    /**
-     * Closes the mobile menu when a link is clicked.
-     */
     const closeMobileMenu = () => {
         setIsMobileMenuOpen(false);
     };
 
+    const navLinks = [
+        { to: '/', text: 'Home' },
+        { to: '/accommodations', text: 'Accommodations' },
+        { to: '/contact', text: 'Contact' },
+    ];
+
     return (
-        <nav className="bg-white shadow-lg fixed w-full z-50 top-0 transition duration-300 ease-in-out transform">
-            <div className="container mx-auto flex items-center justify-between p-4">
-                {/* Logo and Title */}
-                <div className="flex items-center space-x-4">
-                    <img src="/holidaze-logo.png" alt="Holidaze Logo" className="h-10 w-auto" />
-                    <h1 className="text-3xl font-bold text-blue-600 hover:text-blue-800 transition duration-300">
-                        <Link to="/" onClick={closeMobileMenu}>Holidaze</Link>
-                    </h1>
-                </div>
-
-                {/* Toggle Button for Mobile Menu (visible on small screens) */}
-                <div className="lg:hidden">
-                    <button
-                        className="p-2 rounded-md hover:bg-gray-100 transition duration-300"
-                        onClick={handleMobileMenuToggle}
-                    >
-                        {isMobileMenuOpen ? (
-                            <span className="text-2xl text-blue-600">&#10005;</span> // Cross icon when menu is open
-                        ) : (
-                            <span className="text-2xl text-blue-600">&#9776;</span> // Hamburger icon when menu is closed
-                        )}
-                    </button>
-                </div>
-
-                {/* Navigation Links for Desktop */}
-                <ul className="hidden lg:flex lg:space-x-8 lg:justify-center text-lg font-medium text-blue-600">
-                    {[
-                        { to: "/", text: "Home" },
-                        { to: "/accommodations", text: "Accommodations" },
-                        { to: "/contact", text: "Contact" },
-                    ].map((item, index) => (
-                        <li key={index} className="relative group">
-                            <Link to={item.to} className="flex items-center text-xl font-semibold hover:text-blue-800 transition duration-300">
-                                {item.text}
+        <nav className="fixed top-0 w-full z-50 bg-white shadow-md transition-all duration-300">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="flex justify-between h-16">
+                    {/* Logo and Title */}
+                    <div className="flex items-center">
+                        <img
+                            src="/holidaze-logo.png"
+                            alt="Holidaze Logo"
+                            className="h-10 w-auto"
+                        />
+                        <h1 className="ml-3 text-2xl font-bold text-blue-600 hover:text-blue-800 transition-colors duration-300">
+                            <Link to="/" onClick={closeMobileMenu}>
+                                Holidaze
                             </Link>
-                            {/* Underline animation on hover */}
-                            <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        </li>
-                    ))}
+                        </h1>
+                    </div>
 
-                    {isLoggedIn ? (
-                        <>
-                            <li className="relative group">
-                                <Link to="/user-dashboard" className="flex items-center text-xl font-semibold hover:text-blue-800 transition duration-300">
-                                    My Page
-                                </Link>
-                                <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                            </li>
-                            <li className="relative group">
-                                <button
-                                    onClick={handleLogout}
-                                    className="text-xl font-semibold text-blue-600 hover:text-blue-800 transition duration-300"
+                    {/* Desktop Navigation */}
+                    <div className="hidden lg:flex lg:items-center lg:space-x-6">
+                        {navLinks.map((link, index) => (
+                            <div key={index} className="relative group">
+                                <Link
+                                    to={link.to}
+                                    className="text-lg font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
                                 >
-                                    Logout
-                                </button>
-                                <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                            </li>
-                        </>
-                    ) : (
-                        <li className="relative group">
-                            <Link to="/login" className="flex items-center text-xl font-semibold hover:text-blue-800 transition duration-300">
-                                Login
-                            </Link>
-                            <div className="absolute bottom-0 left-0 h-1 w-full bg-blue-600 scale-x-0 group-hover:scale-x-100 transition-transform duration-300"></div>
-                        </li>
-                    )}
-                </ul>
+                                    {link.text}
+                                </Link>
+                                <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                            </div>
+                        ))}
+                        {isLoggedIn ? (
+                            <>
+                                <div className="relative group">
+                                    <Link
+                                        to="/user-dashboard"
+                                        className="text-lg font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
+                                    >
+                                        My Page
+                                    </Link>
+                                    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                                </div>
+                                <div className="relative group">
+                                    <button
+                                        onClick={handleLogout}
+                                        className="text-lg font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
+                                    >
+                                        Logout
+                                    </button>
+                                    <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                                </div>
+                            </>
+                        ) : (
+                            <div className="relative group">
+                                <Link
+                                    to="/login"
+                                    className="text-lg font-medium text-blue-600 hover:text-blue-800 transition-colors duration-300"
+                                >
+                                    Login
+                                </Link>
+                                <span className="absolute left-0 -bottom-1 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full" />
+                            </div>
+                        )}
+                    </div>
 
-                {/* Mobile Menu (visible when toggled open) */}
-                <div className={`fixed inset-0 bg-blue-900 bg-opacity-5 z-20 transition-transform duration-300 ${isMobileMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
-                    <div className="flex justify-end p-4">
+                    {/* Mobile Menu Toggle (always hamburger) */}
+                    <div className="flex lg:hidden items-center">
                         <button
-                            className="p-2 rounded-md hover:bg-blue-700 transition duration-300"
-                            onClick={handleMobileMenuToggle}
+                            onClick={toggleMobileMenu}
+                            className="p-2 rounded-md text-blue-600 hover:text-blue-800 hover:bg-blue-100 transition-colors duration-300 focus:outline-none"
                         >
-                            <span className="text-2xl text-blue">&#10005;</span> {/* Cross symbol to close menu */}
+                            {/* Hamburger Icon */}
+                            <svg
+                                className="h-6 w-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M4 6h16M4 12h16M4 18h16"
+                                />
+                            </svg>
                         </button>
                     </div>
-                    <div className="flex justify-center bg-blue-900 z-50 relative bg-opacity-95">
-                        {/* Navigation Links for Mobile */}
-                        <ul className="flex flex-col space-y-4 p-6 rounded-lg mt-16 text-lg font-semibold text-white">
-                            {[
-                                { to: "/", text: "Home" },
-                                { to: "/accommodations", text: "Accommodations" },
-                                { to: "/contact", text: "Contact" },
-                            ].map((item, index) => (
-                                <li key={index} className="w-full text-center">
-                                    <Link
-                                        to={item.to}
-                                        className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
-                                        onClick={closeMobileMenu} // Close mobile menu when link is clicked
-                                    >
-                                        {item.text}
-                                    </Link>
-                                </li>
-                            ))}
-
-                            {isLoggedIn ? (
-                                <>
-                                    <li className="w-full text-center">
-                                        <Link
-                                            to="/user-dashboard"
-                                            className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
-                                            onClick={closeMobileMenu} // Close mobile menu when link is clicked
-                                        >
-                                            My Page
-                                        </Link>
-                                    </li>
-                                    <li className="w-full text-center">
-                                        <button
-                                            onClick={() => {
-                                                handleLogout();
-                                                closeMobileMenu(); // Close mobile menu after logout
-                                            }}
-                                            className="w-full p-2 rounded-md hover:bg-blue-700 transition duration-300"
-                                        >
-                                            Logout
-                                        </button>
-                                    </li>
-                                </>
-                            ) : (
-                                <li className="w-full text-center">
-                                    <Link
-                                        to="/login"
-                                        className="block p-2 rounded-md hover:bg-blue-700 transition duration-300"
-                                        onClick={closeMobileMenu} // Close mobile menu when link is clicked
-                                    >
-                                        Login
-                                    </Link>
-                                </li>
-                            )}
-                        </ul>
-                    </div>
                 </div>
+            </div>
+
+            {/* Mobile Menu */}
+            {/* Slide the entire container from the left */}
+            <div
+                className={`lg:hidden fixed inset-0 z-40 flex transition-transform duration-300 ease-in-out ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'
+                    }`}
+            >
+                {/* Side Drawer */}
+                <div className="relative w-3/4 max-w-xs h-full bg-blue-900 shadow-lg z-50">
+                    {/* Single Close Button (X) in the drawer */}
+                    <div className="flex justify-end p-4">
+                        <button
+                            onClick={toggleMobileMenu}
+                            className="p-2 rounded-md text-white hover:bg-blue-700 transition-colors duration-300 focus:outline-none"
+                        >
+                            {/* X Icon */}
+                            <svg
+                                className="h-6 w-6"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M6 18L18 6M6 6l12 12"
+                                />
+                            </svg>
+                        </button>
+                    </div>
+
+                    {/* Mobile Nav Links */}
+                    <ul className="flex flex-col items-start px-6 space-y-4">
+                        {navLinks.map((link, index) => (
+                            <li key={index} className="w-full">
+                                <Link
+                                    onClick={closeMobileMenu}
+                                    to={link.to}
+                                    className="block text-xl font-medium text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300"
+                                >
+                                    {link.text}
+                                </Link>
+                            </li>
+                        ))}
+                        {isLoggedIn ? (
+                            <>
+                                <li className="w-full">
+                                    <Link
+                                        onClick={closeMobileMenu}
+                                        to="/user-dashboard"
+                                        className="block text-xl font-medium text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300"
+                                    >
+                                        My Page
+                                    </Link>
+                                </li>
+                                <li className="w-full">
+                                    <button
+                                        onClick={() => {
+                                            handleLogout();
+                                            closeMobileMenu();
+                                        }}
+                                        className="w-full text-left text-xl font-medium text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300"
+                                    >
+                                        Logout
+                                    </button>
+                                </li>
+                            </>
+                        ) : (
+                            <li className="w-full">
+                                <Link
+                                    onClick={closeMobileMenu}
+                                    to="/login"
+                                    className="block text-xl font-medium text-white py-2 px-4 rounded hover:bg-blue-700 transition-colors duration-300"
+                                >
+                                    Login
+                                </Link>
+                            </li>
+                        )}
+                    </ul>
+                </div>
+
+                {/* Transparent Black Overlay (click to close) */}
+                <div
+                    onClick={toggleMobileMenu}
+                    className="flex-1 bg-black bg-opacity-50"
+                ></div>
             </div>
         </nav>
     );

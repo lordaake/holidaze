@@ -1,6 +1,6 @@
 // src/pages/Accommodations.jsx
 
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, { useEffect, useState, useMemo, useRef, useCallback } from 'react';
 import { getAllVenues, searchVenues } from '../services/apiService';
 import VenueCard from '../components/VenueCard';
 import debounce from 'lodash.debounce';
@@ -11,74 +11,46 @@ import 'react-toastify/dist/ReactToastify.css';
 import FilterVenues from '../components/FilterVenues';
 
 /**
- * Accommodations component fetches and displays various categories of venues.
- * It includes search functionality with debouncing, pagination, and categorized sections.
+ * Utility function to shuffle an array using the Fisher-Yates algorithm.
+ * @param {Array} array - The array to shuffle.
+ * @returns {Array} - The shuffled array.
  */
+const shuffleArray = (array) => {
+    const arr = [...array];
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+};
+
 function Accommodations() {
-    // **State Variables**
-
-    // All fetched venues from the API
+    // -------------------- State Variables --------------------
     const [allVenues, setAllVenues] = useState([]);
-
-    // Venues filtered by the filter component
     const [filteredVenues, setFilteredVenues] = useState([]);
-
-    // State to track if filtering is active
     const [isFiltering, setIsFiltering] = useState(false);
-
-    // Venues with top ratings
     const [topVenues, setTopVenues] = useState([]);
-
-    // Venues located in Norway
     const [exploreVenues, setExploreVenues] = useState([]);
-
-    // Trending venues based on popularity or other criteria
     const [trendingVenues, setTrendingVenues] = useState([]);
-
-    // Current search query input by the user
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Combined search results from both server and client-side searches
     const [searchResults, setSearchResults] = useState([]);
-
-    // Indicates if a search operation is in progress
     const [isSearching, setIsSearching] = useState(false);
-
-    // Indicates if the initial data fetching is in progress
     const [loading, setLoading] = useState(true);
-
-    // Indicates if a search operation is loading
     const [searchLoading, setSearchLoading] = useState(false);
-
-    // Holds any error messages
     const [error, setError] = useState(null);
-
-    // **Pagination State**
-
-    // Current page number for the "All Accommodations" or "Filtered Results" section
     const [currentPageAll, setCurrentPageAll] = useState(1);
-
-    // Number of venues to display per page
     const venuesPerPage = 8;
-
-    // **Reference to All Accommodations Section**
-
-    // Reference to the "All Accommodations" section for scrolling
     const allAccommodationsRef = useRef(null);
 
-    /**
-     * Fetches all venues from the API on component mount.
-     * Filters and categorizes venues into top, explore, and trending sections.
-     */
+    // -------------------- Data Fetching & Categorization --------------------
     useEffect(() => {
         const fetchVenues = async () => {
             try {
-                // Fetch all venues from the API
                 const venuesData = await getAllVenues();
                 setAllVenues(venuesData);
 
-                // **Filter Venues for Categories:** Ensure venues have valid media and location
-                const filtered = venuesData.filter((venue) => {
+                // Only use venues with valid media and location data
+                const validVenues = venuesData.filter((venue) => {
                     const hasValidMedia =
                         venue.media?.some(
                             (media) =>
@@ -94,146 +66,93 @@ function Accommodations() {
                     return hasValidMedia && hasValidLocation;
                 });
 
-                // **Filter Venues with 5-Star Rating**
-                const fiveStarVenues = filtered.filter((venue) => venue.rating === 5);
-
-                /**
-                 * Shuffles an array using the Fisher-Yates algorithm.
-                 * @param {Array} array - The array to shuffle.
-                 * @returns {Array} - The shuffled array.
-                 */
-                function shuffleArray(array) {
-                    const arr = [...array];
-                    for (let i = arr.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [arr[i], arr[j]] = [arr[j], arr[i]];
-                    }
-                    return arr;
-                }
-
-                // **Shuffle the Five-Star Venues**
-                const shuffledFiveStarVenues = shuffleArray(fiveStarVenues);
-
-                // **Select Top Venues**
-                let top = [];
-
-                if (shuffledFiveStarVenues.length >= 3) {
-                    // If there are 3 or more five-star venues, select the first three
-                    top = shuffledFiveStarVenues.slice(0, 3);
-                } else {
-                    // If less than 3 five-star venues, take them all
-                    top = shuffledFiveStarVenues;
-
-                    // Fill the rest with other high-rated venues
-                    const remainingVenuesForTop = filtered.filter(
+                // Top venues: Prefer 5-star venues, but fill in with 4-star if needed.
+                const fiveStarVenues = validVenues.filter((venue) => venue.rating === 5);
+                const shuffledFiveStars = shuffleArray(fiveStarVenues);
+                let top = shuffledFiveStars.slice(0, 3);
+                if (top.length < 3) {
+                    const additionalVenues = validVenues.filter(
                         (venue) => !top.includes(venue) && venue.rating >= 4
                     );
-                    const shuffledRemainingVenuesForTop = shuffleArray(remainingVenuesForTop);
-                    const needed = 3 - top.length;
-                    top = top.concat(shuffledRemainingVenuesForTop.slice(0, needed));
+                    top = top.concat(shuffleArray(additionalVenues).slice(0, 3 - top.length));
                 }
 
-                // **Explore Norway Venues**
-                const explore = filtered
+                // Explore Norway venues (exclude those already in top)
+                const explore = validVenues
                     .filter(
                         (venue) =>
                             venue.location.country.toLowerCase() === 'norway' && !top.includes(venue)
                     )
                     .slice(0, 4);
 
-                // **Trending Venues**
-                const remainingVenues = filtered.filter(
+                // Trending venues: Random selection from remaining venues.
+                const remainingVenues = validVenues.filter(
                     (venue) => !top.includes(venue) && !explore.includes(venue)
                 );
-                const shuffledRemainingVenues = shuffleArray(remainingVenues);
-                const trending = shuffledRemainingVenues.slice(0, 3);
+                const trending = shuffleArray(remainingVenues).slice(0, 3);
 
-                // **Update State for Categories**
                 setTopVenues(top);
                 setExploreVenues(explore);
                 setTrendingVenues(trending);
-            } catch (error) {
-                // Handle errors during data fetching
+            } catch (err) {
                 toast.error('Failed to fetch venues. Please try again later.');
                 setError('Failed to fetch venues. Please try again later.');
             } finally {
-                // End loading state
                 setLoading(false);
             }
         };
 
-        // Initiate data fetch
         fetchVenues();
     }, []);
 
-    /**
-     * Handles filter changes from the FilterVenues component.
-     * Applies filters to the existing venues without refetching.
-     */
-    const handleFilterChange = (filters) => {
-        // Apply filtering logic on the fetched venues
-        const filtered = allVenues.filter((venue) => {
-            // Handle missing data gracefully
-            const venueMeta = venue.meta || {};
-            const venueLocation = venue.location || {};
-            const venueRating = venue.rating !== undefined ? venue.rating : 0;
-            const venuePrice = venue.price !== undefined ? venue.price : 0;
-            const venueMaxGuests = venue.maxGuests !== undefined ? venue.maxGuests : 0;
+    // -------------------- Filtering --------------------
+    const handleFilterChange = useCallback(
+        (filters) => {
+            const filtered = allVenues.filter((venue) => {
+                const venueMeta = venue.meta || {};
+                const venueLocation = venue.location || {};
+                const venueRating = venue.rating ?? 0;
+                const venuePrice = venue.price ?? 0;
+                const venueMaxGuests = venue.maxGuests ?? 0;
 
-            // **Amenities Filter**
-            const matchesAmenities = ['wifi', 'parking', 'breakfast', 'pets'].every(
-                (amenity) => !filters[amenity] || venueMeta[amenity]
-            );
+                const matchesAmenities = ['wifi', 'parking', 'breakfast', 'pets'].every(
+                    (amenity) => !filters[amenity] || venueMeta[amenity]
+                );
+                const matchesPrice =
+                    (!filters.minPrice || venuePrice >= filters.minPrice) &&
+                    (!filters.maxPrice || venuePrice <= filters.maxPrice);
+                const matchesGuests =
+                    (!filters.minGuests || venueMaxGuests >= filters.minGuests) &&
+                    (!filters.maxGuests || venueMaxGuests <= filters.maxGuests);
+                const matchesLocation =
+                    (!filters.city ||
+                        (venueLocation.city &&
+                            venueLocation.city.toLowerCase().includes(filters.city.toLowerCase()))) &&
+                    (!filters.country ||
+                        (venueLocation.country &&
+                            venueLocation.country.toLowerCase().includes(filters.country.toLowerCase())));
+                const matchesRating =
+                    !filters.rating ||
+                    (filters.rating === 5
+                        ? venueRating === 5
+                        : venueRating >= filters.rating && venueRating < filters.rating + 1);
 
-            // **Price Filter**
-            const matchesPrice =
-                (!filters.minPrice || venuePrice >= filters.minPrice) &&
-                (!filters.maxPrice || venuePrice <= filters.maxPrice);
+                return matchesAmenities && matchesPrice && matchesGuests && matchesLocation && matchesRating;
+            });
+            setFilteredVenues(filtered);
+            setIsFiltering(true);
+            setCurrentPageAll(1);
+        },
+        [allVenues]
+    );
 
-            // **Guests Filter**
-            const matchesGuests =
-                (!filters.minGuests || venueMaxGuests >= filters.minGuests) &&
-                (!filters.maxGuests || venueMaxGuests <= filters.maxGuests);
-
-            // **Location Filter**
-            const matchesLocation =
-                (!filters.city ||
-                    (venueLocation.city &&
-                        venueLocation.city.toLowerCase().includes(filters.city.toLowerCase()))) &&
-                (!filters.country ||
-                    (venueLocation.country &&
-                        venueLocation.country.toLowerCase().includes(filters.country.toLowerCase())));
-
-            // **Rating Filter**
-            const matchesRating = !filters.rating || (() => {
-                if (filters.rating === 5) {
-                    return venueRating === 5;
-                } else if (filters.rating === 1) {
-                    return venueRating >= 0 && venueRating < 2;
-                } else {
-                    return venueRating >= filters.rating && venueRating < filters.rating + 1;
-                }
-            })();
-
-            // Only return venues that match all the filters
-            return (
-                matchesAmenities &&
-                matchesPrice &&
-                matchesGuests &&
-                matchesLocation &&
-                matchesRating
-            );
-        });
-
-        // Update state with filtered venues
-        setFilteredVenues(filtered);
-        setIsFiltering(true);
-        setCurrentPageAll(1); // Reset to first page when filters change
+    const resetFilter = () => {
+        setFilteredVenues([]);
+        setIsFiltering(false);
+        setCurrentPageAll(1);
     };
 
-    /**
-     * Debounced search function to handle user input with a delay.
-     */
+    // -------------------- Search --------------------
     const debouncedSearch = useMemo(
         () =>
             debounce(async (query) => {
@@ -252,10 +171,7 @@ function Accommodations() {
                 setCurrentPageAll(1);
 
                 try {
-                    // **Server-Side Search: Name and Description**
                     const serverResults = await searchVenues(query);
-
-                    // **Client-Side Search: Location City and Country**
                     const lowerCaseQuery = query.toLowerCase();
                     const clientResults = allVenues.filter(
                         (venue) =>
@@ -266,8 +182,6 @@ function Accommodations() {
                                 venue.location.country &&
                                 venue.location.country.toLowerCase().includes(lowerCaseQuery))
                     );
-
-                    // **Combine Server and Client Search Results**
                     const combined = [
                         ...serverResults,
                         ...clientResults.filter(
@@ -275,9 +189,8 @@ function Accommodations() {
                                 !serverResults.some((serverVenue) => serverVenue.id === clientVenue.id)
                         ),
                     ];
-
                     setSearchResults(combined);
-                } catch (error) {
+                } catch (err) {
                     toast.error('Failed to search venues. Please try again later.');
                     setError('Failed to search venues. Please try again later.');
                     setSearchResults([]);
@@ -288,53 +201,31 @@ function Accommodations() {
         [allVenues]
     );
 
-    /**
-     * Handles changes in the search input field.
-     */
     const handleSearch = (e) => {
         const query = e.target.value;
         setSearchQuery(query);
         debouncedSearch(query);
     };
 
-    /**
-     * Cleanup function to cancel the debounced search when the component unmounts.
-     */
+    const resetSearch = () => {
+        setSearchQuery('');
+        setIsSearching(false);
+        setSearchResults([]);
+        setError(null);
+        setCurrentPageAll(1);
+    };
+
     useEffect(() => {
         return () => {
             debouncedSearch.cancel();
         };
     }, [debouncedSearch]);
 
-    /**
-   * Resets the filter state to show all accommodations.
-   */
-    const resetFilter = () => {
-        setFilteredVenues([]);
-        setIsFiltering(false);
-        setCurrentPageAll(1);
-    };
-
-    /**
-     * Resets the search state to show all accommodations.
-     */
-    const resetSearch = () => {
-        setSearchQuery('');
-        setIsSearching(false);
-        setSearchResults([]);
-        setError(null);
-        setCurrentPageAll(1); // Reset to first page
-    };
-
-    /**
-     * Calculates the venues to display on the current page.
-     */
+    // -------------------- Pagination Helpers --------------------
     const getCurrentVenuesAll = () => {
         const venuesToDisplay = isFiltering ? filteredVenues : allVenues;
-
         const indexOfLastVenue = currentPageAll * venuesPerPage;
         const indexOfFirstVenue = indexOfLastVenue - venuesPerPage;
-
         return venuesToDisplay.slice(indexOfFirstVenue, indexOfLastVenue);
     };
 
@@ -342,19 +233,15 @@ function Accommodations() {
         (isFiltering ? filteredVenues.length : allVenues.length) / venuesPerPage
     );
 
-    /**
-     * Handles page changes for pagination.
-     */
     const handlePageChangeAll = (newPage) => {
-        if (newPage < 1 || newPage > totalPagesAll) return; // Prevent invalid page numbers
+        if (newPage < 1 || newPage > totalPagesAll) return;
         setCurrentPageAll(newPage);
         if (allAccommodationsRef.current) {
-            // Scroll to the top of the section smoothly
             allAccommodationsRef.current.scrollIntoView({ behavior: 'smooth' });
         }
     };
 
-    // **Conditional Rendering for Loading State**
+    // -------------------- Render --------------------
     if (loading) {
         return (
             <div className="container mx-auto py-16 px-4">
@@ -364,8 +251,7 @@ function Accommodations() {
     }
 
     return (
-        <div className="container mx-auto py-16 px-4">
-            {/* ToastContainer to render toast notifications */}
+        <div className="container mx-auto py-8 px-4">
             <ToastContainer
                 position="top-right"
                 autoClose={3000}
@@ -378,14 +264,14 @@ function Accommodations() {
                 pauseOnHover
             />
 
-            {/* **Search Bar** */}
+            {/* Search Bar */}
             <div className="mb-6 flex justify-center relative">
                 <input
                     type="text"
                     value={searchQuery}
                     onChange={handleSearch}
                     placeholder="Search by name, city, or country"
-                    className="w-full max-w-lg p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full max-w-lg p-3 border border-gray-300 rounded-lg shadow focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
                 {isSearching && (
                     <button
@@ -398,51 +284,41 @@ function Accommodations() {
                 )}
             </div>
 
-            {/* **Filter Component** */}
+            {/* Filter Section */}
             {!isSearching && (
-                <div className="mb-12 flex flex-col sm:flex-row justify-between sm:justify-center items-center space-y-4 sm:space-y-0 relative sm:space-x-4 sm:items-start">
-                    {/* Filter Input Section */}
+                <div className="mb-12 flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4">
                     <div className="w-full sm:w-auto">
                         <FilterVenues onFilterChange={handleFilterChange} />
                     </div>
-
-                    {/* Reset Filter Button */}
                     {isFiltering && (
-                        <div className="w-full sm:w-auto">
-                            <button
-                                onClick={resetFilter}
-                                className="w-full sm:w-auto bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 font-semibold flex items-center justify-center px-4 py-2 rounded-lg"
-                                aria-label="Reset Filter"
-                            >
-                                <FaArrowLeft className="mr-1" /> Back
-                            </button>
-                        </div>
+                        <button
+                            onClick={resetFilter}
+                            className="w-full sm:w-auto bg-red-100 text-red-600 hover:bg-red-200 hover:text-red-800 font-semibold flex items-center justify-center px-4 py-2 rounded-lg"
+                            aria-label="Reset Filter"
+                        >
+                            <FaArrowLeft className="mr-1" /> Back
+                        </button>
                     )}
                 </div>
             )}
 
-            {/* **Error Message** */}
             {error && <div className="mb-8 text-center text-red-500">{error}</div>}
 
-            {/* **Conditional Rendering Based on Search and Filter State** */}
+            {/* Search Results */}
             {isSearching ? (
                 <section className="mb-16">
-                    {/* Search Results Title */}
                     <h2 className="text-3xl font-bold mb-8 text-center text-blue-900">
                         {searchLoading ? 'Searching...' : `Search Results for "${searchQuery}"`}
                     </h2>
-                    {/* Loading Indicator for Search */}
                     {searchLoading ? (
                         <p className="text-center text-gray-500">Loading search results...</p>
                     ) : searchResults.length > 0 ? (
-                        // **Search Results Grid**
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                             {searchResults.map((venue) => (
                                 <VenueCard key={venue.id} venue={venue} />
                             ))}
                         </div>
                     ) : (
-                        // Message when no search results are found
                         <p className="text-center text-gray-700 text-lg">
                             No venues match your search.
                         </p>
@@ -450,13 +326,12 @@ function Accommodations() {
                 </section>
             ) : (
                 <>
-                    {/* **Top Rated Accommodations Section** */}
+                    {/* Top Rated Accommodations */}
                     {!isFiltering && topVenues.length > 0 && (
                         <section className="mb-16">
                             <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
                                 Top Rated Accommodations
                             </h2>
-                            {/* Top Venues Grid */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                                 {topVenues.map((venue) => (
                                     <VenueCard key={venue.id} venue={venue} topRated />
@@ -465,13 +340,12 @@ function Accommodations() {
                         </section>
                     )}
 
-                    {/* **Explore Norway Section** */}
+                    {/* Explore Norway */}
                     {!isFiltering && exploreVenues.length > 0 && (
                         <section className="mb-16">
                             <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
                                 Explore Norway
                             </h2>
-                            {/* Explore Norway Venues Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                 {exploreVenues.map((venue) => (
                                     <VenueCard key={venue.id} venue={venue} />
@@ -480,13 +354,12 @@ function Accommodations() {
                         </section>
                     )}
 
-                    {/* **Trending Destinations Section** */}
+                    {/* Trending Destinations */}
                     {!isFiltering && trendingVenues.length > 0 && (
                         <section className="mb-16">
                             <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
                                 Trending Destinations
                             </h2>
-                            {/* Trending Venues Grid */}
                             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                                 {trendingVenues.map((venue) => (
                                     <VenueCard key={venue.id} venue={venue} />
@@ -495,21 +368,18 @@ function Accommodations() {
                         </section>
                     )}
 
-                    {/* **Filtered Results or All Accommodations Section** */}
+                    {/* All Accommodations / Filtered Results */}
                     <section ref={allAccommodationsRef}>
                         <h2 className="text-4xl font-bold mb-8 text-center text-blue-900">
                             {isFiltering ? 'Filtered Results' : 'All Accommodations'}
                         </h2>
                         {getCurrentVenuesAll().length > 0 ? (
                             <>
-                                {/* Venues Grid */}
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                                     {getCurrentVenuesAll().map((venue) => (
                                         <VenueCard key={venue.id} venue={venue} />
                                     ))}
                                 </div>
-
-                                {/* **Pagination Controls** */}
                                 <Pagination
                                     currentPage={currentPageAll}
                                     totalPages={totalPagesAll}
@@ -517,7 +387,6 @@ function Accommodations() {
                                 />
                             </>
                         ) : (
-                            // Message when no results are found
                             <p className="text-center text-gray-700 text-lg">
                                 No venues match your {isFiltering ? 'filters' : 'search'}.
                             </p>
