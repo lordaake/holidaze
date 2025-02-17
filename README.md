@@ -1,5 +1,7 @@
 # Holidaze Booking Platform
 
+![Holidaze Screenshot](https://tordlarsson.com/assets/holidaze-screenshot-CWUvGlQ0.png)
+
 ## Project Overview
 
 Holidaze is a modern accommodation booking platform that allows users to search for venues, make bookings, and manage their stays. Venue managers can also list, update, and manage bookings for their venues. This project demonstrates both technical and visual skills developed over two years, using the Noroff API to handle accommodation listings and bookings.
